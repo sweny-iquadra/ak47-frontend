@@ -41,9 +41,11 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
 
   const callOpenAI = async (userMessage, conversationHistory) => {
     try {
-      // Use window.location.origin to get the correct base URL
-      const baseUrl = window.location.origin;
-      const response = await fetch(`${baseUrl}/api/chat`, {
+      // Use the correct server URL - the Express server runs on port 5000
+      const serverUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000' 
+        : `${window.location.protocol}//${window.location.hostname}:5000`;
+      const response = await fetch(`${serverUrl}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
