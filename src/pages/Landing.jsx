@@ -1,13 +1,25 @@
-import React from 'react';
-import Header from '../components/Header';
-import SearchBar from '../components/SearchBar';
-import FeatureCard from '../components/FeatureCard';
+import React, { useState } from 'react';
 import { HERO_CONTENT, FEATURES } from '../constants';
+import { Header, SearchBar, FeatureCard } from '../components';
+import Chatbot from '../components/Chatbot';
 
 const Landing = () => {
+  const [showChatbot, setShowChatbot] = useState(false);
+  const [chatbotQuery, setChatbotQuery] = useState('');
+
   const handleSearch = (query) => {
-    console.log('Searching for:', query);
-    // Add search logic here
+    console.log('Search query:', query);
+    // Implement search functionality
+  };
+
+  const handleChatbot = (query) => {
+    setChatbotQuery(query);
+    setShowChatbot(true);
+  };
+
+  const closeChatbot = () => {
+    setShowChatbot(false);
+    setChatbotQuery('');
   };
 
   const renderFeatureIcon = (iconColor) => {
@@ -58,7 +70,11 @@ const Landing = () => {
                 {HERO_CONTENT.subtitle}
               </p>
 
-              <SearchBar onSearch={handleSearch} />
+              <SearchBar 
+                onSearch={handleSearch}
+                onChatbot={handleChatbot}
+                placeholder="Hi! What can I help you find today?"
+              />
             </div>
           </div>
         </div>
@@ -88,7 +104,14 @@ const Landing = () => {
             </div>
           </div>
         </section>
-      </main>
+
+      {/* Chatbot Modal */}
+      {showChatbot && (
+        <Chatbot 
+          initialQuery={chatbotQuery}
+          onClose={closeChatbot}
+        />
+      )}
     </div>
   );
 };

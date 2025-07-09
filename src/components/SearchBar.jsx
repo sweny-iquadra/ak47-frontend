@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
 
-const SearchBar = ({ onSearch, placeholder = "Hi! What can I help you find today?" }) => {
+const SearchBar = ({ onSearch, onChatbot, placeholder = "Hi! What can I help you find today?" }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (onSearch) {
+    if (searchQuery.trim() && onChatbot) {
+      onChatbot(searchQuery);
+    } else if (onSearch) {
       onSearch(searchQuery);
     }
   };
