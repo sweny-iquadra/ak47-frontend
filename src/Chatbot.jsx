@@ -404,7 +404,7 @@ const Chatbot = () => {
         )}
       </div>
 
-      <style jsx>{`
+      <style jsx="true">{`
         .slider::-webkit-slider-thumb {
           appearance: none;
           height: 20px;
