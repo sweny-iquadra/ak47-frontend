@@ -31,10 +31,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from React build (for production)
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'build')));
-}
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, 'build')));
 
 
 
@@ -134,12 +132,15 @@ Be conversational, helpful, and focus on understanding the user's specific needs
   }
 });
 
-// Serve React app for all other routes (production only)
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
+// API routes should come first, then serve React app for all other routes
+app.get('*', (req, res) => {
+  // Only serve React app for non-API routes
+  if (req.path.startsWith('/api/')) {
+    res.status(404).json({ error: 'API endpoint not found' });
+  } else {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
-  });
-}
+  }
+});
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);

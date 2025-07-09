@@ -41,10 +41,9 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
 
   const callOpenAI = async (userMessage, conversationHistory) => {
     try {
-      // In Replit development, we'll use the backend server directly
-      // The server.js runs on port 5000 and is accessible via the external URL
-      const baseUrl = window.location.origin.replace('3000', '5000');
-      const response = await fetch(`${baseUrl}/api/chat`, {
+      // In Replit, when running in parallel, the server runs on the same domain but different internal routing
+      // We can use relative URLs since both services are served through the same domain
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +158,7 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message, index) => (
-              <div key={`${message.id}-${index}`} className="flex items-start space-x-3">
+              <div key={`message-${message.id}-${index}`} className="flex items-start space-x-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-sm font-medium">
                   {message.type === 'bot' ? 'AI' : 'U'}
                 </div>
@@ -201,7 +200,7 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
               <div className="space-y-4 mt-6">
                 <h3 className="font-semibold text-gray-800">Here are some options that match your requirements:</h3>
                 {products.map((product, index) => (
-                  <div key={`product-${product.name}-${index}`} className="border rounded-lg p-4 flex space-x-4">
+                  <div key={`product-${index}-${product.name.replace(/\s+/g, '-')}`} className="border rounded-lg p-4 flex space-x-4">
                     <div className="w-20 h-20 bg-gray-200 rounded flex-shrink-0"></div>
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-800">{product.name}</h4>

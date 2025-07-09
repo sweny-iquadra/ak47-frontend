@@ -30,7 +30,7 @@ mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm start"
+args = "npm run build"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
