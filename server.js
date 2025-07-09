@@ -19,8 +19,9 @@ app.use(cors({
     'http://localhost:3000',
     'https://localhost:3000',
     /\.replit\.dev$/,
-    /\.repl\.co$/
-  ],
+    /\.repl\.co$/,
+    process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : null
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(express.json());
@@ -154,5 +155,6 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
+  console.log(`API test endpoint: http://0.0.0.0:${PORT}/api/test-key`);
 });
