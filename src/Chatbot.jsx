@@ -128,7 +128,7 @@ const Chatbot = () => {
   const handleSendMessage = async () => {
     if (inputMessage.trim() && !isLoading) {
       const userMessage = {
-        id: messages.length + 1,
+        id: Date.now() + Math.random(),
         type: 'user',
         text: inputMessage,
         sender: 'User'
@@ -150,7 +150,7 @@ const Chatbot = () => {
         const aiResponse = await callOpenAI(messageToSend, detectedCategory);
         
         const aiMessage = {
-          id: messages.length + 2,
+          id: Date.now() + Math.random(),
           type: 'ai',
           text: aiResponse,
           sender: 'AI Assistant'
@@ -159,7 +159,7 @@ const Chatbot = () => {
         setMessages(prev => [...prev, aiMessage]);
       } catch (error) {
         const errorMessage = {
-          id: messages.length + 2,
+          id: Date.now() + Math.random(),
           type: 'ai',
           text: "I apologize, but I'm experiencing technical difficulties. Please try again.",
           sender: 'AI Assistant'
@@ -186,7 +186,7 @@ const Chatbot = () => {
       try {
         const aiResponse = await callOpenAI(priceMessage, detectedCategory);
         const aiMessage = {
-          id: messages.length + 1,
+          id: Date.now() + Math.random(),
           type: 'ai',
           text: aiResponse,
           sender: 'AI Assistant'
@@ -218,7 +218,7 @@ const Chatbot = () => {
     try {
       const aiResponse = await callOpenAI(filterMessage, detectedCategory);
       const aiMessage = {
-        id: messages.length + 1,
+        id: Date.now() + Math.random(),
         type: 'ai',
         text: aiResponse,
         sender: 'AI Assistant'
