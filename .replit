@@ -12,7 +12,7 @@ localPort = 3000
 externalPort = 80
 
 [workflows]
-runButton = "Start React App"
+runButton = "Development Server"
 
 [[workflows.workflow]]
 name = "Start React App"
@@ -22,3 +22,16 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm start"
+
+[[workflows.workflow]]
+name = "Development Server"
+author = 44266006
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm start"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node server.js"

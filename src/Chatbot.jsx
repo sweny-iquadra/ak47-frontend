@@ -1,119 +1,234 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: 'ai',
-      text: "Hi there! I'm your AI assistant. How can I help you today?",
-      sender: 'AI Assistant'
-    },
-    {
-      id: 2,
-      type: 'user',
-      text: "I'm looking for a new laptop.",
-      sender: 'User'
-    },
-    {
-      id: 3,
-      type: 'ai',
-      text: "Great! What are you planning to use the laptop for?",
-      sender: 'AI Assistant'
-    },
-    {
-      id: 4,
-      type: 'user',
-      text: "Mostly for work and some light gaming.",
-      sender: 'User'
-    },
-    {
-      id: 5,
-      type: 'ai',
-      text: "Got it. Do you have a preferred screen size or budget?",
-      sender: 'AI Assistant'
-    },
-    {
-      id: 6,
-      type: 'user',
-      text: "Around 15 inches and a budget of $1500.",
-      sender: 'User'
-    },
-    {
-      id: 7,
-      type: 'ai',
-      text: "Okay, I'll find some options that fit your criteria. Please wait a moment.",
-      sender: 'AI Assistant'
-    },
-    {
-      id: 8,
-      type: 'ai',
-      text: "Here are a few laptops that match your requirements:",
+      text: "Hi there! I'm your AI shopping assistant. What product are you looking for today?",
       sender: 'AI Assistant'
     }
   ]);
 
   const [inputMessage, setInputMessage] = useState('');
-  const [filters, setFilters] = useState({
-    brand: 'Any',
-    screenSize: 'Any',
-    processor: 'Any',
-    ram: 'Any',
-    storage: 'Any',
-    graphicsCard: 'Any',
-    priceRange: [0, 1500]
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentFilters, setCurrentFilters] = useState(null);
+  const [detectedCategory, setDetectedCategory] = useState('');
+  const messagesEndRef = useRef(null);
 
-  const [products] = useState([
-    {
-      id: 1,
-      name: 'TechPro X15',
-      specs: '15.5 inch, Intel Core i7, 16GB RAM, 512GB SSD, NVIDIA GeForce RTX 3060',
-      image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Dynamic filter configurations based on product categories
+  const filterConfigs = {
+    laptop: {
+      brand: ['Any', 'Apple', 'Dell', 'HP', 'Lenovo', 'ASUS', 'Acer', 'MSI'],
+      screenSize: ['Any', '13 inch', '14 inch', '15 inch', '16 inch', '17 inch'],
+      processor: ['Any', 'Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core i9', 'AMD Ryzen 5', 'AMD Ryzen 7', 'AMD Ryzen 9'],
+      ram: ['Any', '8GB', '16GB', '32GB', '64GB'],
+      storage: ['Any', '256GB SSD', '512GB SSD', '1TB SSD', '2TB SSD'],
+      graphicsCard: ['Any', 'Integrated', 'NVIDIA GTX 1650', 'NVIDIA RTX 3060', 'NVIDIA RTX 4060', 'AMD Radeon RX 6600M'],
+      priceRange: [0, 3000]
     },
-    {
-      id: 2,
-      name: 'UltraBook Pro 15',
-      specs: '15.6 inch, AMD Ryzen 7, 16GB RAM, 512GB SSD, AMD Radeon RX 6600M',
-      image: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+    smartphone: {
+      brand: ['Any', 'Apple', 'Samsung', 'Google', 'OnePlus', 'Xiaomi', 'Huawei'],
+      screenSize: ['Any', '5.5 inch', '6.1 inch', '6.4 inch', '6.7 inch', '6.9 inch'],
+      storage: ['Any', '64GB', '128GB', '256GB', '512GB', '1TB'],
+      ram: ['Any', '4GB', '6GB', '8GB', '12GB', '16GB'],
+      camera: ['Any', 'Single', 'Dual', 'Triple', 'Quad'],
+      operatingSystem: ['Any', 'iOS', 'Android'],
+      priceRange: [0, 1500]
     },
-    {
-      id: 3,
-      name: 'ZenithBook 15',
-      specs: '15.6 inch, Intel Core i5, 16GB RAM, 512GB SSD, Intel Iris Xe Graphics',
-      image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+    headphones: {
+      brand: ['Any', 'Sony', 'Bose', 'Apple', 'Sennheiser', 'Audio-Technica', 'Beats'],
+      type: ['Any', 'Over-ear', 'On-ear', 'In-ear', 'Wireless', 'Wired'],
+      features: ['Any', 'Noise Cancelling', 'Wireless', 'Gaming', 'Sports'],
+      priceRange: [0, 500]
+    },
+    tv: {
+      brand: ['Any', 'Samsung', 'LG', 'Sony', 'TCL', 'Hisense', 'Panasonic'],
+      screenSize: ['Any', '32 inch', '43 inch', '50 inch', '55 inch', '65 inch', '75 inch', '85 inch'],
+      resolution: ['Any', 'HD', 'Full HD', '4K', '8K'],
+      smartFeatures: ['Any', 'Smart TV', 'Android TV', 'webOS', 'Tizen'],
+      priceRange: [0, 2000]
     }
-  ]);
+  };
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      const newMessage = {
+  const [filters, setFilters] = useState({});
+
+  const detectProductCategory = (text) => {
+    const lowercaseText = text.toLowerCase();
+    
+    if (lowercaseText.includes('laptop') || lowercaseText.includes('computer') || lowercaseText.includes('notebook')) {
+      return 'laptop';
+    } else if (lowercaseText.includes('phone') || lowercaseText.includes('smartphone') || lowercaseText.includes('mobile')) {
+      return 'smartphone';
+    } else if (lowercaseText.includes('headphone') || lowercaseText.includes('earphone') || lowercaseText.includes('earbuds') || lowercaseText.includes('audio')) {
+      return 'headphones';
+    } else if (lowercaseText.includes('tv') || lowercaseText.includes('television') || lowercaseText.includes('monitor')) {
+      return 'tv';
+    }
+    
+    return '';
+  };
+
+  const initializeFilters = (category) => {
+    if (filterConfigs[category]) {
+      const initialFilters = {};
+      Object.keys(filterConfigs[category]).forEach(key => {
+        if (key === 'priceRange') {
+          initialFilters[key] = filterConfigs[category][key];
+        } else {
+          initialFilters[key] = 'Any';
+        }
+      });
+      setFilters(initialFilters);
+      setCurrentFilters(filterConfigs[category]);
+      setDetectedCategory(category);
+    }
+  };
+
+  const callOpenAI = async (userMessage, category = '') => {
+    try {
+      const systemPrompt = category 
+        ? `You are a helpful AI shopping assistant specializing in ${category}. Help users find the perfect ${category} based on their needs. Be concise, friendly, and ask relevant questions about specifications, budget, and use cases. When discussing products, mention specific features and price ranges.`
+        : "You are a helpful AI shopping assistant. Help users find products they're looking for. Ask about their needs, budget, and preferences. Be concise and friendly.";
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+      return data.response;
+    } catch (error) {
+      console.error('Error calling OpenAI:', error);
+      return "I apologize, but I'm having trouble connecting to my AI service right now. Please try again in a moment.";
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (inputMessage.trim() && !isLoading) {
+      const userMessage = {
         id: messages.length + 1,
         type: 'user',
         text: inputMessage,
         sender: 'User'
       };
-      setMessages([...messages, newMessage]);
+      
+      setMessages(prev => [...prev, userMessage]);
+      setIsLoading(true);
+      
+      // Detect product category and initialize filters if needed
+      const category = detectProductCategory(inputMessage);
+      if (category && !currentFilters) {
+        initializeFilters(category);
+      }
+      
+      const messageToSend = inputMessage;
       setInputMessage('');
       
-      // Simulate AI response
-      setTimeout(() => {
-        const aiResponse = {
+      try {
+        const aiResponse = await callOpenAI(messageToSend, detectedCategory);
+        
+        const aiMessage = {
           id: messages.length + 2,
           type: 'ai',
-          text: "I understand your request. Let me help you find the best options.",
+          text: aiResponse,
           sender: 'AI Assistant'
         };
-        setMessages(prev => [...prev, aiResponse]);
-      }, 1000);
+        
+        setMessages(prev => [...prev, aiMessage]);
+      } catch (error) {
+        const errorMessage = {
+          id: messages.length + 2,
+          type: 'ai',
+          text: "I apologize, but I'm experiencing technical difficulties. Please try again.",
+          sender: 'AI Assistant'
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      }
+      
+      setIsLoading(false);
     }
   };
 
-  const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({
-      ...prev,
+  const handleFilterChange = async (filterType, value) => {
+    const updatedFilters = {
+      ...filters,
       [filterType]: value
-    }));
+    };
+    setFilters(updatedFilters);
+
+    // Generate AI response based on filter changes
+    if (filterType === 'priceRange') {
+      setIsLoading(true);
+      const priceMessage = `I'm looking for ${detectedCategory} under $${value[1]}. Can you show me some options?`;
+      
+      try {
+        const aiResponse = await callOpenAI(priceMessage, detectedCategory);
+        const aiMessage = {
+          id: messages.length + 1,
+          type: 'ai',
+          text: aiResponse,
+          sender: 'AI Assistant'
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      } catch (error) {
+        console.error('Error getting AI response for filter change:', error);
+      }
+      
+      setIsLoading(false);
+    }
+  };
+
+  const handleApplyFilters = async () => {
+    setIsLoading(true);
+    
+    const filterSummary = Object.entries(filters)
+      .filter(([key, value]) => value !== 'Any' && value !== undefined)
+      .map(([key, value]) => {
+        if (key === 'priceRange') {
+          return `budget under $${value[1]}`;
+        }
+        return `${key}: ${value}`;
+      })
+      .join(', ');
+
+    const filterMessage = `Based on my preferences: ${filterSummary}, can you recommend some ${detectedCategory} options?`;
+    
+    try {
+      const aiResponse = await callOpenAI(filterMessage, detectedCategory);
+      const aiMessage = {
+        id: messages.length + 1,
+        type: 'ai',
+        text: aiResponse,
+        sender: 'AI Assistant'
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -122,29 +237,26 @@ const Chatbot = () => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
             <div className="flex items-center">
               <div className="text-xl font-bold text-gray-900">■ AK-47</div>
             </div>
             
-            {/* Navigation Links */}
             <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
                 Home
-              </a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+              </button>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
                 Products
-              </a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+              </button>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
                 About Us
-              </a>
-              <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+              </button>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
                 Contact
-              </a>
+              </button>
               <div className="w-6 h-6 bg-gray-300 rounded"></div>
             </nav>
 
-            {/* Mobile menu button */}
             <div className="md:hidden">
               <button className="text-gray-700 hover:text-gray-900">
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -156,21 +268,20 @@ const Chatbot = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <div className="flex flex-col lg:flex-row h-[calc(100vh-4rem)]">
         {/* Chat Section */}
         <div className="flex-1 flex flex-col">
-          {/* Chat Header */}
           <div className="bg-white border-b px-6 py-4">
             <h2 className="text-xl font-semibold text-gray-900">Chat with us</h2>
+            {detectedCategory && (
+              <p className="text-sm text-gray-600 mt-1">Currently helping you find: {detectedCategory}</p>
+            )}
           </div>
 
-          {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`flex items-start space-x-3 max-w-xs lg:max-w-md ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                  {/* Avatar */}
                   <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0">
                     {message.type === 'user' ? (
                       <div className="w-full h-full bg-yellow-400 rounded-full flex items-center justify-center">
@@ -183,37 +294,34 @@ const Chatbot = () => {
                     )}
                   </div>
                   
-                  {/* Message Content */}
                   <div className={`rounded-lg p-3 ${message.type === 'user' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-200 text-gray-900'}`}>
                     <div className="text-xs text-gray-600 mb-1">{message.sender}</div>
-                    <div className="text-sm">{message.text}</div>
+                    <div className="text-sm whitespace-pre-wrap">{message.text}</div>
                   </div>
                 </div>
               </div>
             ))}
-
-            {/* Product Results */}
-            <div className="space-y-4 mt-6">
-              {products.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg p-4 shadow-sm border">
-                  <div className="flex space-x-4">
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{product.specs}</p>
-                      <button className="text-blue-600 text-sm hover:underline">View Product</button>
+            
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                    <span className="text-xs font-medium text-white">AI</span>
+                  </div>
+                  <div className="bg-gray-200 rounded-lg p-3">
+                    <div className="text-xs text-gray-600 mb-1">AI Assistant</div>
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Message Input */}
           <div className="bg-white border-t p-4">
             <div className="flex space-x-3">
               <div className="w-8 h-8 bg-gray-300 rounded-full flex-shrink-0"></div>
@@ -222,13 +330,15 @@ const Chatbot = () => {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSendMessage()}
                   placeholder="Type your message..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 disabled:opacity-50"
                 />
                 <button 
                   onClick={handleSendMessage}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  disabled={isLoading || !inputMessage.trim()}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -239,137 +349,59 @@ const Chatbot = () => {
           </div>
         </div>
 
-        {/* Filters Sidebar */}
-        <div className="w-full lg:w-80 bg-white border-l border-gray-200 p-6 overflow-y-auto">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Filters</h3>
-          
-          <div className="space-y-6">
-            {/* Brand Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Brand</label>
-              <select 
-                value={filters.brand}
-                onChange={(e) => handleFilterChange('brand', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                <option>Any</option>
-                <option>Apple</option>
-                <option>Dell</option>
-                <option>HP</option>
-                <option>Lenovo</option>
-                <option>ASUS</option>
-              </select>
-            </div>
-
-            {/* Screen Size Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Screen Size</label>
-              <select 
-                value={filters.screenSize}
-                onChange={(e) => handleFilterChange('screenSize', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                <option>Any</option>
-                <option>13 inch</option>
-                <option>14 inch</option>
-                <option>15 inch</option>
-                <option>16 inch</option>
-                <option>17 inch</option>
-              </select>
-            </div>
-
-            {/* Processor Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Processor</label>
-              <select 
-                value={filters.processor}
-                onChange={(e) => handleFilterChange('processor', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                <option>Any</option>
-                <option>Intel Core i3</option>
-                <option>Intel Core i5</option>
-                <option>Intel Core i7</option>
-                <option>Intel Core i9</option>
-                <option>AMD Ryzen 5</option>
-                <option>AMD Ryzen 7</option>
-              </select>
-            </div>
-
-            {/* RAM Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">RAM</label>
-              <select 
-                value={filters.ram}
-                onChange={(e) => handleFilterChange('ram', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                <option>Any</option>
-                <option>8GB</option>
-                <option>16GB</option>
-                <option>32GB</option>
-                <option>64GB</option>
-              </select>
-            </div>
-
-            {/* Storage Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Storage</label>
-              <select 
-                value={filters.storage}
-                onChange={(e) => handleFilterChange('storage', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                <option>Any</option>
-                <option>256GB SSD</option>
-                <option>512GB SSD</option>
-                <option>1TB SSD</option>
-                <option>2TB SSD</option>
-              </select>
-            </div>
-
-            {/* Graphics Card Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Graphics Card</label>
-              <select 
-                value={filters.graphicsCard}
-                onChange={(e) => handleFilterChange('graphicsCard', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              >
-                <option>Any</option>
-                <option>Integrated</option>
-                <option>NVIDIA GTX 1650</option>
-                <option>NVIDIA RTX 3060</option>
-                <option>NVIDIA RTX 4060</option>
-                <option>AMD Radeon RX 6600M</option>
-              </select>
-            </div>
-
-            {/* Price Range Slider */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
-              <div className="px-2">
-                <input
-                  type="range"
-                  min="0"
-                  max="3000"
-                  value={filters.priceRange[1]}
-                  onChange={(e) => handleFilterChange('priceRange', [0, parseInt(e.target.value)])}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                />
-                <div className="flex justify-between text-sm text-gray-600 mt-1">
-                  <span>$0</span>
-                  <span>${filters.priceRange[1]}</span>
+        {/* Dynamic Filters Sidebar */}
+        {currentFilters && (
+          <div className="w-full lg:w-80 bg-white border-l border-gray-200 p-6 overflow-y-auto">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">
+              Filters for {detectedCategory.charAt(0).toUpperCase() + detectedCategory.slice(1)}
+            </h3>
+            
+            <div className="space-y-6">
+              {Object.entries(currentFilters).map(([filterKey, filterOptions]) => (
+                <div key={filterKey}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 capitalize">
+                    {filterKey.replace(/([A-Z])/g, ' $1').trim()}
+                  </label>
+                  
+                  {filterKey === 'priceRange' ? (
+                    <div className="px-2">
+                      <input
+                        type="range"
+                        min={filterOptions[0]}
+                        max={filterOptions[1]}
+                        value={filters[filterKey] ? filters[filterKey][1] : filterOptions[1]}
+                        onChange={(e) => handleFilterChange(filterKey, [filterOptions[0], parseInt(e.target.value)])}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                      />
+                      <div className="flex justify-between text-sm text-gray-600 mt-1">
+                        <span>${filterOptions[0]}</span>
+                        <span>${filters[filterKey] ? filters[filterKey][1] : filterOptions[1]}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <select 
+                      value={filters[filterKey] || 'Any'}
+                      onChange={(e) => handleFilterChange(filterKey, e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                    >
+                      {filterOptions.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
-              </div>
-            </div>
+              ))}
 
-            {/* Apply Filters Button */}
-            <button className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-4 rounded-lg transition-colors">
-              Apply Filters
-            </button>
+              <button 
+                onClick={handleApplyFilters}
+                disabled={isLoading}
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {isLoading ? 'Finding Products...' : 'Apply Filters'}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <style jsx>{`
