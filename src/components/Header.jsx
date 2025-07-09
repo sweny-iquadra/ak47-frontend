@@ -15,18 +15,12 @@ const Header = () => {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex space-x-8">
-            <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
-              Home
-            </a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
-              Shop
-            </a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
-              About
-            </a>
-            <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
-              Contact
-            </a>
+            <button 
+              onClick={() => window.open('https://replit.com/auth_with_repl_site?domain=' + window.location.host, '_blank', 'modal=yes, toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=350, height=500')}
+              className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+            >
+              Login
+            </button>
           </nav>
 
           {/* Mobile menu button */}
@@ -50,18 +44,15 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            <a href="#" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              Home
-            </a>
-            <a href="#" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              Shop
-            </a>
-            <a href="#" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              About
-            </a>
-            <a href="#" className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-              Contact
-            </a>
+            <button 
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                window.open('https://replit.com/auth_with_repl_site?domain=' + window.location.host, '_blank', 'modal=yes, toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=350, height=500');
+              }}
+              className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+            >
+              Login
+            </button>
           </div>
         </div>
       )}
