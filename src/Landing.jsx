@@ -56,18 +56,23 @@ const Landing = () => {
       {/* Hero Section */}
       <main className="relative">
         <div className="relative h-96 md:h-[500px] lg:h-[600px]">
-          {/* Background Image Placeholder */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-100 to-orange-200">
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2158&q=80')`
+            }}
+          >
+            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
           </div>
           
           {/* Hero Content */}
           <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+            <div className="text-center backdrop-blur-sm bg-white/10 rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
                 Welcome to AK-47
               </h1>
-              <p className="text-lg md:text-xl text-white mb-8 opacity-90">
+              <p className="text-lg md:text-xl text-white/90 mb-8 font-medium">
                 Your personal AI shopping assistant. Ask me anything!
               </p>
               
@@ -78,10 +83,10 @@ const Landing = () => {
                     <input
                       type="text"
                       placeholder="What are you looking for?"
-                      className="w-full px-6 py-4 text-lg border-0 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                      className="w-full px-6 py-4 text-lg border-0 rounded-xl shadow-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white/95 backdrop-blur-sm placeholder-gray-500"
                     />
                   </div>
-                  <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-4 rounded-lg shadow-lg transition duration-200 transform hover:scale-105">
+                  <button className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 font-bold px-8 py-4 rounded-xl shadow-xl transition duration-300 transform hover:scale-105 hover:shadow-2xl">
                     Search
                   </button>
                 </div>
