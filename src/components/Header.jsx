@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 const Header = () => {
@@ -12,7 +11,7 @@ const Header = () => {
           <div className="flex items-center">
             <div className="text-xl font-bold text-gray-900">AK-47</div>
           </div>
-          
+
           {/* Navigation Links */}
           <nav className="hidden md:flex space-x-8">
             <a href="#" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">

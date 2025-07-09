@@ -2,10 +2,10 @@
 export const APP_NAME = 'AK-47';
 
 export const NAVIGATION_ITEMS = [
-  { name: 'Home', href: '#' },
-  { name: 'Shop', href: '#' },
-  { name: 'About', href: '#' },
-  { name: 'Contact', href: '#' }
+  { name: 'Home', href: '/' },
+  { name: 'Shop', href: '/shop' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' }
 ];
 
 export const FEATURES = [
