@@ -16,11 +16,11 @@
 
 .logo-svg {
   @apply transition-all duration-300 ease-in-out;
-  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.2));
+  filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.2));
 }
 
 .logo-svg:hover {
-  filter: drop-shadow(0 6px 12px rgba(59, 130, 246, 0.3));
+  filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.3));
 }
 
 .brand-text {
@@ -54,7 +54,7 @@
 
 /* Button styles */
 .btn-primary {
-  @apply px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 font-medium;
+  @apply px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition duration-200 font-medium shadow-md hover:shadow-lg;
 }
 
 .btn-secondary {

@@ -25,7 +25,7 @@ const SearchBar = ({ onSearch, placeholder = "What are you looking for?" }) => {
         </div>
         <button
           type="submit"
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 font-medium"
+          className="px-6 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition duration-200 font-medium shadow-md hover:shadow-lg"
         >
           Search
         </button>

@@ -16,82 +16,86 @@ const Logo = ({ size = 'default', showText = true }) => {
 
   return (
     <div className="flex items-center space-x-3 logo-container group">
-      {/* Professional AK-47 Logo */}
+      {/* Warm Minimalist Logo */}
       <div className="relative">
         <svg 
           width="40" 
           height="40" 
           viewBox="0 0 40 40" 
-          className={`text-blue-600 logo-svg transition-all duration-300 ${sizeClasses[size]}`}
+          className={`text-amber-600 logo-svg transition-all duration-300 ${sizeClasses[size]}`}
           fill="currentColor"
         >
-          {/* Outer circle with gradient effect */}
-          <circle 
-            cx="20" 
-            cy="20" 
-            r="18" 
-            fill="url(#logoGradient)" 
+          {/* Outer rounded square with warm gradient */}
+          <rect 
+            x="2" 
+            y="2" 
+            width="36" 
+            height="36" 
+            rx="8" 
+            fill="url(#warmGradient)" 
             stroke="currentColor" 
-            strokeWidth="2"
+            strokeWidth="1.5"
           />
           
-          {/* Inner geometric pattern */}
+          {/* Inner geometric pattern - abstract house/shelter symbol */}
           <path 
-            d="M12 20 L20 12 L28 20 L20 28 Z" 
-            fill="white" 
+            d="M12 28 L12 18 L20 12 L28 18 L28 28 Z" 
+            fill="url(#lightGradient)" 
             opacity="0.9"
           />
           
-          {/* Central diamond */}
+          {/* Central element - stylized "A" */}
           <path 
-            d="M16 20 L20 16 L24 20 L20 24 Z" 
-            fill="currentColor"
-          />
-          
-          {/* Stylized "A" in the center */}
-          <path 
-            d="M18 22 L19 19 L21 19 L22 22 M19.5 20.5 L20.5 20.5" 
-            stroke="white" 
-            strokeWidth="1.5" 
+            d="M16 24 L18 18 L22 18 L24 24 M18.5 21 L21.5 21" 
+            stroke="#8B4513" 
+            strokeWidth="2" 
             strokeLinecap="round" 
             fill="none"
           />
           
-          {/* Additional decorative elements */}
-          <circle cx="13" cy="13" r="1" fill="white" opacity="0.6" />
-          <circle cx="27" cy="13" r="1" fill="white" opacity="0.6" />
-          <circle cx="13" cy="27" r="1" fill="white" opacity="0.6" />
-          <circle cx="27" cy="27" r="1" fill="white" opacity="0.6" />
+          {/* Decorative dots in corners */}
+          <circle cx="8" cy="8" r="1.5" fill="#D2691E" opacity="0.7" />
+          <circle cx="32" cy="8" r="1.5" fill="#D2691E" opacity="0.7" />
+          <circle cx="8" cy="32" r="1.5" fill="#D2691E" opacity="0.7" />
+          <circle cx="32" cy="32" r="1.5" fill="#D2691E" opacity="0.7" />
           
-          {/* Gradient definition */}
+          {/* Gradient definitions */}
           <defs>
-            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3B82F6" />
-              <stop offset="25%" stopColor="#2563EB" />
-              <stop offset="50%" stopColor="#1D4ED8" />
-              <stop offset="75%" stopColor="#1E40AF" />
-              <stop offset="100%" stopColor="#1E3A8A" />
+            {/* Main warm gradient */}
+            <linearGradient id="warmGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#F4A460" />
+              <stop offset="25%" stopColor="#D2691E" />
+              <stop offset="50%" stopColor="#CD853F" />
+              <stop offset="75%" stopColor="#A0522D" />
+              <stop offset="100%" stopColor="#8B4513" />
             </linearGradient>
             
-            {/* Additional gradient for hover effect */}
-            <radialGradient id="hoverGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#60A5FA" />
-              <stop offset="100%" stopColor="#3B82F6" />
+            {/* Light cream gradient for inner shape */}
+            <linearGradient id="lightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFF8DC" />
+              <stop offset="50%" stopColor="#F5DEB3" />
+              <stop offset="100%" stopColor="#DEB887" />
+            </linearGradient>
+            
+            {/* Hover effect gradient */}
+            <radialGradient id="hoverWarmGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#FFE4B5" />
+              <stop offset="100%" stopColor="#F4A460" />
             </radialGradient>
           </defs>
         </svg>
         
-        {/* Enhanced glow effect */}
-        <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md -z-10 logo-glow group-hover:opacity-40 group-hover:scale-110 transition-all duration-300"></div>
+        {/* Warm glow effect */}
+        <div className="absolute inset-0 rounded-lg bg-amber-400 opacity-10 blur-md -z-10 logo-glow group-hover:opacity-30 group-hover:scale-110 transition-all duration-300"></div>
       </div>
       
-      {/* Brand name with modern typography */}
+      {/* Brand name with warm color scheme */}
       {showText && (
         <div className="flex flex-col brand-text">
-          <div className={`font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
+          <div className={`font-bold bg-gradient-to-r from-amber-700 via-orange-600 to-amber-800 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
             AK-47
           </div>
-          <div className="text-xs text-gray-500 font-medium tracking-wide uppercase">
+          <div className="text-xs text-amber-600 font-medium tracking-wide uppercase">
             AI Assistant
           </div>
         </div>
