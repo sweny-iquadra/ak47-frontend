@@ -1,6 +1,52 @@
 
 /* Component-specific styles */
 
+/* Professional Logo Styles */
+.logo-container {
+  @apply relative transition-all duration-300 ease-in-out;
+}
+
+.logo-container:hover {
+  @apply transform scale-105;
+}
+
+.logo-container:hover .logo-glow {
+  @apply opacity-40 scale-110;
+}
+
+.logo-svg {
+  @apply transition-all duration-300 ease-in-out;
+  filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.2));
+}
+
+.logo-svg:hover {
+  filter: drop-shadow(0 6px 12px rgba(59, 130, 246, 0.3));
+}
+
+.brand-text {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.brand-text:hover {
+  @apply transform translate-x-1;
+}
+
+/* Animated gradient background for logo */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.05);
+  }
+}
+
+.logo-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
 /* Header styles */
 .header-link {
   @apply text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200;

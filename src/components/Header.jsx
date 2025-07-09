@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Logo from './Logo';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -9,7 +10,7 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="text-xl font-bold text-gray-900">AK-47</div>
+            <Logo size="default" showText={true} />
           </div>
 
           {/* Navigation Links */}
