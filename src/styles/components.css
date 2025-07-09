@@ -1,0 +1,39 @@
+
+/* Component-specific styles */
+
+/* Header styles */
+.header-link {
+  @apply text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 font-medium;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-200 font-medium;
+}
+
+/* Input styles */
+.input-primary {
+  @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900;
+}
+
+/* Card styles */
+.feature-card {
+  @apply text-center p-6 hover:shadow-lg transition-shadow duration-300;
+}
+
+/* Hero section styles */
+.hero-background {
+  @apply absolute inset-0 bg-cover bg-center bg-no-repeat;
+}
+
+.hero-overlay {
+  @apply absolute inset-0 bg-black bg-opacity-40;
+}
+
+.hero-content {
+  @apply text-center backdrop-blur-sm bg-white/10 rounded-3xl p-8 md:p-12 border border-white/20 shadow-2xl;
+}
