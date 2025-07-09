@@ -403,26 +403,7 @@ const Chatbot = () => {
         )}
       </div>
 
-      <style jsx="true">{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #FDE047;
-          cursor: pointer;
-          border: 2px solid #374151;
-        }
-
-        .slider::-moz-range-thumb {
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #FDE047;
-          cursor: pointer;
-          border: 2px solid #374151;
-        }
-      `}</style>
+      
     </div>
   );
 };
