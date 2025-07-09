@@ -11,26 +11,26 @@ export const NAVIGATION_ITEMS = [
 export const FEATURES = [
   {
     id: 1,
-    title: 'Lightning Fast',
-    description: 'Get instant responses to your shopping queries',
+    title: 'Instant Product Search',
+    description: 'Find exactly what you need with AI-powered search',
     iconColor: 'blue'
   },
   {
     id: 2,
-    title: 'Smart Recommendations',
-    description: 'AI-powered suggestions tailored to your preferences',
+    title: 'Smart Price Comparison',
+    description: 'Compare prices across stores to get the best deals',
     iconColor: 'green'
   },
   {
     id: 3,
-    title: 'Secure & Private',
-    description: 'Your data is protected with enterprise-grade security',
+    title: 'Personalized Suggestions',
+    description: 'Discover products tailored to your style and budget',
     iconColor: 'purple'
   }
 ];
 
 export const HERO_CONTENT = {
-  title: 'Welcome to AK-47',
-  subtitle: 'Your personal AI shopping assistant. Ask me anything!',
+  title: 'Shop Smarter with AK-47',
+  subtitle: 'Your AI shopping companion for better deals and perfect finds',
   backgroundImage: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
 };
