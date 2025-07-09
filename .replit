@@ -10,3 +10,15 @@ run = ["sh", "-c", "npm run start"]
 [[ports]]
 localPort = 3000
 externalPort = 80
+
+[workflows]
+runButton = "Start React App"
+
+[[workflows.workflow]]
+name = "Start React App"
+author = 44266006
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm start"
