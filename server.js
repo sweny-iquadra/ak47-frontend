@@ -13,9 +13,14 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Middleware
+// Middleware  
 app.use(cors({
-  origin: true,
+  origin: [
+    'http://localhost:3000',
+    'https://localhost:3000',
+    /\.replit\.dev$/,
+    /\.repl\.co$/
+  ],
   credentials: true
 }));
 app.use(express.json());
