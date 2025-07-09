@@ -158,7 +158,7 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message, index) => (
-              <div key={`message-${message.id}-${index}`} className="flex items-start space-x-3">
+              <div key={`message-${message.id}-${message.timestamp.getTime()}-${index}`} className="flex items-start space-x-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-sm font-medium">
                   {message.type === 'bot' ? 'AI' : 'U'}
                 </div>

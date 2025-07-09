@@ -28,7 +28,7 @@ app.use(express.json());
 
 // Add request logging
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`, req.body);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`, req.body);
   next();
 });
 
