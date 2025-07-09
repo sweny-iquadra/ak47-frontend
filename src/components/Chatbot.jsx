@@ -41,7 +41,9 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
 
   const callOpenAI = async (userMessage, conversationHistory) => {
     try {
-      const response = await fetch('/api/chat', {
+      // Use window.location.origin to get the correct base URL
+      const baseUrl = window.location.origin;
+      const response = await fetch(`${baseUrl}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +55,9 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response');
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`API Error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -153,8 +157,8 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {messages.map((message) => (
-              <div key={message.id} className="flex items-start space-x-3">
+            {messages.map((message, index) => (
+              <div key={`${message.id}-${index}`} className="flex items-start space-x-3">
                 <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-sm font-medium">
                   {message.type === 'bot' ? 'AI' : 'U'}
                 </div>
@@ -196,7 +200,7 @@ const Chatbot = ({ initialQuery = '', onClose }) => {
               <div className="space-y-4 mt-6">
                 <h3 className="font-semibold text-gray-800">Here are some options that match your requirements:</h3>
                 {products.map((product, index) => (
-                  <div key={index} className="border rounded-lg p-4 flex space-x-4">
+                  <div key={`product-${product.name}-${index}`} className="border rounded-lg p-4 flex space-x-4">
                     <div className="w-20 h-20 bg-gray-200 rounded flex-shrink-0"></div>
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-800">{product.name}</h4>

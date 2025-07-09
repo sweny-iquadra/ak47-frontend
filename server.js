@@ -14,8 +14,17 @@ const openai = new OpenAI({
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
+
+// Add request logging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`, req.body);
+  next();
+});
 
 // Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
@@ -33,7 +42,13 @@ app.post('/api/chat', async (req, res) => {
     const { message, history = [] } = req.body;
     
     if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ error: 'OpenAI API key not configured' });
+      console.error('OpenAI API key not configured');
+      return res.status(500).json({ 
+        error: 'OpenAI API key not configured',
+        response: "I'm sorry, the AI service is not properly configured. Please check the server configuration.",
+        showFilters: false,
+        products: []
+      });
     }
 
     // Build conversation context
