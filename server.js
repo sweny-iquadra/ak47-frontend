@@ -41,6 +41,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running', port: PORT });
 });
 
+// Test OpenAI API key endpoint
+app.get('/api/test-key', (req, res) => {
+  const hasKey = !!process.env.OPENAI_API_KEY;
+  const keyLength = process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0;
+  res.json({ 
+    hasKey, 
+    keyLength,
+    keyStart: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 7) + '...' : 'Not set'
+  });
+});
+
 // Chat endpoint for OpenAI integration
 app.post('/api/chat', async (req, res) => {
   try {
