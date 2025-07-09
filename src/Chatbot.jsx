@@ -149,7 +149,7 @@ const Chatbot = () => {
         const aiResponse = await callOpenAI(messageToSend, detectedCategory);
 
         const aiMessage = {
-          id: Date.now() + Math.random() * 1000,
+          id: `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'ai',
           text: aiResponse,
           sender: 'AI Assistant'
@@ -185,7 +185,7 @@ const Chatbot = () => {
       try {
         const aiResponse = await callOpenAI(priceMessage, detectedCategory);
         const aiMessage = {
-          id: Date.now() + Math.random() * 1000,
+          id: `ai-filter-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'ai',
           text: aiResponse,
           sender: 'AI Assistant'
@@ -217,7 +217,7 @@ const Chatbot = () => {
     try {
       const aiResponse = await callOpenAI(filterMessage, detectedCategory);
       const aiMessage = {
-        id: Date.now() + Math.random() * 1000,
+        id: `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type: 'ai',
         text: aiResponse,
         sender: 'AI Assistant'
