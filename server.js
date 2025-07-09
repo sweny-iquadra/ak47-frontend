@@ -20,7 +20,8 @@ app.post('/api/chat', async (req, res) => {
     const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
     if (!OPENAI_API_KEY) {
-      return res.status(500).json({ error: 'OpenAI API key not configured' });
+      console.log('OpenAI API key not found in environment variables');
+      return res.status(500).json({ error: 'OpenAI API key not configured. Please set up your API key in the Secrets tool.' });
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -38,15 +39,22 @@ app.post('/api/chat', async (req, res) => {
     });
 
     if (!response.ok) {
-      throw new Error('OpenAI API request failed');
+      const errorData = await response.text();
+      console.error('OpenAI API error:', response.status, errorData);
+      throw new Error(`OpenAI API request failed: ${response.status}`);
     }
 
     const data = await response.json();
     res.json({ response: data.choices[0].message.content });
   } catch (error) {
     console.error('Error calling OpenAI API:', error);
-    res.status(500).json({ error: 'Failed to get AI response' });
+    res.status(500).json({ error: 'Failed to get AI response. Please check your API key and try again.' });
   }
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'Server is running', port: PORT });
 });
 
 // Serve React app for all other routes
@@ -56,4 +64,5 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`OpenAI API Key configured: ${process.env.OPENAI_API_KEY ? 'Yes' : 'No'}`);
 });

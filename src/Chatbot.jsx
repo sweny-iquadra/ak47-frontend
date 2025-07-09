@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 
 const Chatbot = () => {
@@ -64,7 +63,7 @@ const Chatbot = () => {
 
   const detectProductCategory = (text) => {
     const lowercaseText = text.toLowerCase();
-    
+
     if (lowercaseText.includes('laptop') || lowercaseText.includes('computer') || lowercaseText.includes('notebook')) {
       return 'laptop';
     } else if (lowercaseText.includes('phone') || lowercaseText.includes('smartphone') || lowercaseText.includes('mobile')) {
@@ -74,7 +73,7 @@ const Chatbot = () => {
     } else if (lowercaseText.includes('tv') || lowercaseText.includes('television') || lowercaseText.includes('monitor')) {
       return 'tv';
     }
-    
+
     return '';
   };
 
@@ -128,45 +127,45 @@ const Chatbot = () => {
   const handleSendMessage = async () => {
     if (inputMessage.trim() && !isLoading) {
       const userMessage = {
-        id: Date.now() + Math.random(),
+        id: Date.now() + Math.random() * 1000,
         type: 'user',
         text: inputMessage,
         sender: 'User'
       };
-      
+
       setMessages(prev => [...prev, userMessage]);
       setIsLoading(true);
-      
+
       // Detect product category and initialize filters if needed
       const category = detectProductCategory(inputMessage);
       if (category && !currentFilters) {
         initializeFilters(category);
       }
-      
+
       const messageToSend = inputMessage;
       setInputMessage('');
-      
+
       try {
         const aiResponse = await callOpenAI(messageToSend, detectedCategory);
-        
+
         const aiMessage = {
-          id: Date.now() + Math.random(),
+          id: Date.now() + Math.random() * 1000,
           type: 'ai',
           text: aiResponse,
           sender: 'AI Assistant'
         };
-        
+
         setMessages(prev => [...prev, aiMessage]);
       } catch (error) {
         const errorMessage = {
-          id: Date.now() + Math.random(),
+          id: Date.now() + Math.random() * 1000,
           type: 'ai',
           text: "I apologize, but I'm experiencing technical difficulties. Please try again.",
           sender: 'AI Assistant'
         };
         setMessages(prev => [...prev, errorMessage]);
       }
-      
+
       setIsLoading(false);
     }
   };
@@ -182,11 +181,11 @@ const Chatbot = () => {
     if (filterType === 'priceRange') {
       setIsLoading(true);
       const priceMessage = `I'm looking for ${detectedCategory} under $${value[1]}. Can you show me some options?`;
-      
+
       try {
         const aiResponse = await callOpenAI(priceMessage, detectedCategory);
         const aiMessage = {
-          id: Date.now() + Math.random(),
+          id: Date.now() + Math.random() * 1000,
           type: 'ai',
           text: aiResponse,
           sender: 'AI Assistant'
@@ -195,14 +194,14 @@ const Chatbot = () => {
       } catch (error) {
         console.error('Error getting AI response for filter change:', error);
       }
-      
+
       setIsLoading(false);
     }
   };
 
   const handleApplyFilters = async () => {
     setIsLoading(true);
-    
+
     const filterSummary = Object.entries(filters)
       .filter(([key, value]) => value !== 'Any' && value !== undefined)
       .map(([key, value]) => {
@@ -214,11 +213,11 @@ const Chatbot = () => {
       .join(', ');
 
     const filterMessage = `Based on my preferences: ${filterSummary}, can you recommend some ${detectedCategory} options?`;
-    
+
     try {
       const aiResponse = await callOpenAI(filterMessage, detectedCategory);
       const aiMessage = {
-        id: Date.now() + Math.random(),
+        id: Date.now() + Math.random() * 1000,
         type: 'ai',
         text: aiResponse,
         sender: 'AI Assistant'
@@ -227,7 +226,7 @@ const Chatbot = () => {
     } catch (error) {
       console.error('Error applying filters:', error);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -240,7 +239,7 @@ const Chatbot = () => {
             <div className="flex items-center">
               <div className="text-xl font-bold text-gray-900">■ AK-47</div>
             </div>
-            
+
             <nav className="hidden md:flex space-x-8">
               <button className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
                 Home
@@ -293,7 +292,7 @@ const Chatbot = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className={`rounded-lg p-3 ${message.type === 'user' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-200 text-gray-900'}`}>
                     <div className="text-xs text-gray-600 mb-1">{message.sender}</div>
                     <div className="text-sm whitespace-pre-wrap">{message.text}</div>
@@ -301,7 +300,7 @@ const Chatbot = () => {
                 </div>
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex justify-start">
                 <div className="flex items-start space-x-3">
@@ -355,14 +354,14 @@ const Chatbot = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-6">
               Filters for {detectedCategory.charAt(0).toUpperCase() + detectedCategory.slice(1)}
             </h3>
-            
+
             <div className="space-y-6">
               {Object.entries(currentFilters).map(([filterKey, filterOptions]) => (
                 <div key={filterKey}>
                   <label className="block text-sm font-medium text-gray-700 mb-2 capitalize">
                     {filterKey.replace(/([A-Z])/g, ' $1').trim()}
                   </label>
-                  
+
                   {filterKey === 'priceRange' ? (
                     <div className="px-2">
                       <input
