@@ -105,13 +105,14 @@ const Landing = () => {
           </div>
         </section>
 
-      {/* Chatbot Modal */}
-      {showChatbot && (
-        <Chatbot 
-          initialQuery={chatbotQuery}
-          onClose={closeChatbot}
-        />
-      )}
+        {/* Chatbot Modal */}
+        {showChatbot && (
+          <Chatbot 
+            initialQuery={chatbotQuery}
+            onClose={closeChatbot}
+          />
+        )}
+      </main>
     </div>
   );
 };
