@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-const SearchBar = ({ onSearch, placeholder = "What are you looking for?" }) => {
+const SearchBar = ({ onSearch, placeholder = "Hi! What can I help you find today?" }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSubmit = (e) => {
