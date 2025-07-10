@@ -40,13 +40,19 @@ const ProductDetails = () => {
               <Logo size="default" showText={true} />
             </div>
 
-            {/* Navigation Links - Only Home */}
+            {/* Navigation Links - Home and Chatbot */}
             <nav className="hidden md:flex space-x-8">
               <Link 
                 to="/"
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
               >
                 Home
+              </Link>
+              <Link 
+                to="/chat"
+                className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+              >
+                Chatbot
               </Link>
             </nav>
 
