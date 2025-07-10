@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { HERO_CONTENT, FEATURES } from '../constants';
 import { Header, SearchBar, FeatureCard } from '../components';
 
 const Landing = () => {
+  const navigate = useNavigate();
+  
   const handleSearch = (query) => {
     console.log('Search query:', query);
-    // Implement search functionality
+    navigate('/chat', { state: { searchQuery: query } });
   };
 
   const renderFeatureIcon = (iconColor) => {
