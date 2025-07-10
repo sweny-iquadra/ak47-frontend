@@ -43,26 +43,26 @@ const Logo = ({ size = 'default', showText = true }) => {
             strokeWidth="2" 
             strokeLinecap="round" 
             strokeLinejoin="round"
-            opacity="0.9"
+            opacity="0.95"
           />
           
           {/* Cart wheels */}
-          <circle cx="16" cy="26" r="1.5" fill="#ffffff" opacity="0.9" />
-          <circle cx="26" cy="26" r="1.5" fill="#ffffff" opacity="0.9" />
+          <circle cx="16" cy="26" r="1.5" fill="#ffffff" opacity="0.95" />
+          <circle cx="26" cy="26" r="1.5" fill="#ffffff" opacity="0.95" />
           
           {/* AI Brain circuits overlay */}
-          <g opacity="0.8">
+          <g opacity="0.9">
             {/* Neural network nodes */}
-            <circle cx="20" cy="12" r="1" fill="#60A5FA" />
-            <circle cx="16" cy="16" r="1" fill="#60A5FA" />
-            <circle cx="24" cy="16" r="1" fill="#60A5FA" />
-            <circle cx="20" cy="20" r="1" fill="#60A5FA" />
+            <circle cx="20" cy="12" r="1" fill="#A855F7" />
+            <circle cx="16" cy="16" r="1" fill="#A855F7" />
+            <circle cx="24" cy="16" r="1" fill="#A855F7" />
+            <circle cx="20" cy="20" r="1" fill="#A855F7" />
             
             {/* Neural connections */}
-            <line x1="20" y1="12" x2="16" y2="16" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
-            <line x1="20" y1="12" x2="24" y2="16" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
-            <line x1="16" y1="16" x2="20" y2="20" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
-            <line x1="24" y1="16" x2="20" y2="20" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
+            <line x1="20" y1="12" x2="16" y2="16" stroke="#A855F7" strokeWidth="0.8" opacity="0.8" />
+            <line x1="20" y1="12" x2="24" y2="16" stroke="#A855F7" strokeWidth="0.8" opacity="0.8" />
+            <line x1="16" y1="16" x2="20" y2="20" stroke="#A855F7" strokeWidth="0.8" opacity="0.8" />
+            <line x1="24" y1="16" x2="20" y2="20" stroke="#A855F7" strokeWidth="0.8" opacity="0.8" />
           </g>
           
           {/* AI Chip/Processor symbol */}
@@ -84,36 +84,36 @@ const Logo = ({ size = 'default', showText = true }) => {
           <line x1="23" y1="11" x2="25" y2="11" stroke="#ffffff" strokeWidth="0.5" />
           
           {/* Search/Magnifying glass */}
-          <circle cx="32" cy="8" r="3" fill="none" stroke="#FFD700" strokeWidth="1.5" opacity="0.8" />
-          <line x1="34.5" y1="10.5" x2="37" y2="13" stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
+          <circle cx="32" cy="8" r="3" fill="none" stroke="#F59E0B" strokeWidth="1.5" opacity="0.9" />
+          <line x1="34.5" y1="10.5" x2="37" y2="13" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
           
           {/* Price tag */}
           <path 
             d="M6 30 L10 30 L12 28 L10 26 L6 26 Z" 
-            fill="#FF6B6B" 
-            opacity="0.8"
+            fill="#10B981" 
+            opacity="0.9"
           />
           <circle cx="8" cy="28" r="0.5" fill="#ffffff" />
           
           {/* Gradient definitions */}
           <defs>
-            {/* Main AI gradient */}
+            {/* Main AI gradient - Modern teal to purple */}
             <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3B82F6" />
-              <stop offset="25%" stopColor="#2563EB" />
-              <stop offset="50%" stopColor="#1D4ED8" />
-              <stop offset="75%" stopColor="#1E40AF" />
-              <stop offset="100%" stopColor="#1E3A8A" />
+              <stop offset="0%" stopColor="#0D9488" />
+              <stop offset="25%" stopColor="#0891B2" />
+              <stop offset="50%" stopColor="#3B82F6" />
+              <stop offset="75%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#A855F7" />
             </linearGradient>
             
             {/* Border gradient */}
             <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#60A5FA" />
-              <stop offset="50%" stopColor="#3B82F6" />
-              <stop offset="100%" stopColor="#1D4ED8" />
+              <stop offset="0%" stopColor="#14B8A6" />
+              <stop offset="50%" stopColor="#06B6D4" />
+              <stop offset="100%" stopColor="#8B5CF6" />
             </linearGradient>
             
-            {/* Chip gradient */}
+            {/* Chip gradient - Emerald green for tech */}
             <linearGradient id="chipGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#10B981" />
               <stop offset="100%" stopColor="#059669" />
@@ -122,17 +122,17 @@ const Logo = ({ size = 'default', showText = true }) => {
         </svg>
         
         {/* Animated glow effect */}
-        <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md -z-10 logo-glow group-hover:opacity-40 group-hover:scale-110 transition-all duration-300 animate-pulse"></div>
+        <div className="absolute inset-0 rounded-full bg-teal-400 opacity-20 blur-md -z-10 logo-glow group-hover:opacity-40 group-hover:scale-110 transition-all duration-300 animate-pulse"></div>
       </div>
       
       {/* Brand name with tech-inspired styling */}
       {showText && (
         <div className="flex flex-col brand-text">
-          <div className={`font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
+          <div className={`font-bold bg-gradient-to-r from-teal-600 via-blue-600 to-purple-600 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
             AK-47
           </div>
-          <div className="text-xs text-blue-600 font-medium tracking-wide uppercase flex items-center space-x-1">
-            <span className="inline-block w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
+          <div className="text-xs text-teal-600 font-medium tracking-wide uppercase flex items-center space-x-1">
+            <span className="inline-block w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>
             <span>AI Shopping Assistant</span>
           </div>
         </div>
