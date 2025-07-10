@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HERO_CONTENT, FEATURES } from '../constants';
 import { Header, SearchBar, FeatureCard } from '../components';

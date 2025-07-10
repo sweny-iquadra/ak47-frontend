@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
 
   return (
     <header className="bg-white shadow-sm">
@@ -16,7 +22,7 @@ const Header = () => {
           {/* Navigation Links */}
           <nav className="hidden md:flex space-x-8">
             <button 
-              onClick={() => window.open('https://replit.com/auth_with_repl_site?domain=' + window.location.host, '_blank', 'modal=yes, toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=350, height=500')}
+              onClick={handleLoginClick}
               className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
             >
               Login
@@ -47,7 +53,7 @@ const Header = () => {
             <button 
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                window.open('https://replit.com/auth_with_repl_site?domain=' + window.location.host, '_blank', 'modal=yes, toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=350, height=500');
+                handleLoginClick();
               }}
               className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             >
