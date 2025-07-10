@@ -232,7 +232,7 @@ const ProductDetails = () => {
             onClick={handleBuyNow}
             className="w-full max-w-sm bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
           >
-            Buy Now at TechMart
+            Buy Now
           </button>
         </div>
       </main>
