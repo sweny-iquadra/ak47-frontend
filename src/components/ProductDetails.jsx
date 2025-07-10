@@ -83,7 +83,25 @@ const ProductDetails = () => {
               </button>
               
               {/* Profile */}
-              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center ml-2 hover:bg-amber-600 transition-colors duration-200 cursor-pointer">
+              <div 
+                onClick={() => {
+                  // TODO: Authentication check - uncomment when ready to implement
+                  /*
+                  const token = localStorage.getItem('token');
+                  const user = localStorage.getItem('user');
+                  
+                  if (token && user) {
+                    navigate('/profile');
+                  } else {
+                    navigate('/login');
+                  }
+                  */
+                  
+                  // For now, always navigate to profile (comment out when implementing auth)
+                  navigate('/profile');
+                }}
+                className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center ml-2 hover:bg-amber-600 transition-colors duration-200 cursor-pointer"
+              >
                 <span className="text-white text-sm font-medium">U</span>
               </div>
             </div>
@@ -237,6 +255,38 @@ const ProductDetails = () => {
             The Nova X500 is available for $799.99. Price may vary depending on retailer promotions and discounts.
           </p>
           
+          {/* TODO: Authentication check - uncomment when ready to implement */}
+          {/*
+          {(() => {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (token && user) {
+              return (
+                <button
+                  onClick={handleBuyNow}
+                  className="w-full max-w-sm bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                >
+                  Buy Now
+                </button>
+              );
+            } else {
+              return (
+                <div className="space-y-4">
+                  <p className="text-gray-600 text-sm">Please log in to purchase this item</p>
+                  <Link
+                    to="/login"
+                    className="inline-block w-full max-w-sm bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg text-center"
+                  >
+                    Login to Buy
+                  </Link>
+                </div>
+              );
+            }
+          })()}
+          */}
+          
+          {/* For now, show Buy Now button for everyone (comment out when implementing auth) */}
           <button
             onClick={handleBuyNow}
             className="w-full max-w-sm bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
