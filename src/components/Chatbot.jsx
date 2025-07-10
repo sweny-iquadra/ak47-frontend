@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -149,6 +148,19 @@ const Chatbot = () => {
     console.log('Applying filters:', filters, 'Price range:', priceRange);
   };
 
+  const handleViewProduct = (productId) => {
+    // TODO: Implement authentication check
+    // const isLoggedIn = checkUserAuthentication(); // Replace with your actual authentication check
+    const isLoggedIn = true; // Comment out authentication check for now
+
+    if (isLoggedIn) {
+      navigate(`/product/${productId}`);
+    } else {
+      // Redirect to login or signup page
+      navigate('/login'); // Or /signup, depending on your preference
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
@@ -234,7 +246,10 @@ const Chatbot = () => {
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">{product.name}</h3>
                     <p className="text-sm text-gray-600 mt-1">{product.specs}</p>
-                    <button className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    <button 
+                      onClick={() => handleViewProduct(product.id)}
+                      className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 text-sm font-medium transition-colors duration-200"
+                    >
                       {product.action}
                     </button>
                   </div>
