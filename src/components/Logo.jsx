@@ -53,16 +53,16 @@ const Logo = ({ size = 'default', showText = true }) => {
           {/* AI Brain circuits overlay */}
           <g opacity="0.9">
             {/* Neural network nodes */}
-            <circle cx="20" cy="12" r="1" fill="#7C3AED" />
-            <circle cx="16" cy="16" r="1" fill="#7C3AED" />
-            <circle cx="24" cy="16" r="1" fill="#7C3AED" />
-            <circle cx="20" cy="20" r="1" fill="#7C3AED" />
+            <circle cx="20" cy="12" r="1" fill="#059669" />
+            <circle cx="16" cy="16" r="1" fill="#059669" />
+            <circle cx="24" cy="16" r="1" fill="#059669" />
+            <circle cx="20" cy="20" r="1" fill="#059669" />
             
             {/* Neural connections */}
-            <line x1="20" y1="12" x2="16" y2="16" stroke="#7C3AED" strokeWidth="0.8" opacity="0.8" />
-            <line x1="20" y1="12" x2="24" y2="16" stroke="#7C3AED" strokeWidth="0.8" opacity="0.8" />
-            <line x1="16" y1="16" x2="20" y2="20" stroke="#7C3AED" strokeWidth="0.8" opacity="0.8" />
-            <line x1="24" y1="16" x2="20" y2="20" stroke="#7C3AED" strokeWidth="0.8" opacity="0.8" />
+            <line x1="20" y1="12" x2="16" y2="16" stroke="#059669" strokeWidth="0.8" opacity="0.8" />
+            <line x1="20" y1="12" x2="24" y2="16" stroke="#059669" strokeWidth="0.8" opacity="0.8" />
+            <line x1="16" y1="16" x2="20" y2="20" stroke="#059669" strokeWidth="0.8" opacity="0.8" />
+            <line x1="24" y1="16" x2="20" y2="20" stroke="#059669" strokeWidth="0.8" opacity="0.8" />
           </g>
           
           {/* AI Chip/Processor symbol */}
@@ -102,14 +102,14 @@ const Logo = ({ size = 'default', showText = true }) => {
               <stop offset="0%" stopColor="#0F766E" />
               <stop offset="30%" stopColor="#0891B2" />
               <stop offset="70%" stopColor="#3B82F6" />
-              <stop offset="100%" stopColor="#7C3AED" />
+              <stop offset="100%" stopColor="#059669" />
             </linearGradient>
             
             {/* Border gradient */}
             <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#F59E0B" />
               <stop offset="50%" stopColor="#0891B2" />
-              <stop offset="100%" stopColor="#7C3AED" />
+              <stop offset="100%" stopColor="#059669" />
             </linearGradient>
             
             {/* Chip gradient - Amber accent for tech */}
@@ -127,7 +127,7 @@ const Logo = ({ size = 'default', showText = true }) => {
       {/* Brand name with tech-inspired styling */}
       {showText && (
         <div className="flex flex-col brand-text">
-          <div className={`font-bold bg-gradient-to-r from-teal-700 via-blue-600 to-purple-600 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
+          <div className={`font-bold bg-gradient-to-r from-teal-700 via-blue-600 to-emerald-600 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
             AK-47
           </div>
           <div className="text-xs text-amber-600 font-medium tracking-wide uppercase flex items-center space-x-1">
