@@ -1,25 +1,11 @@
 import React, { useState } from 'react';
 import { HERO_CONTENT, FEATURES } from '../constants';
 import { Header, SearchBar, FeatureCard } from '../components';
-import Chatbot from '../components/Chatbot';
 
 const Landing = () => {
-  const [showChatbot, setShowChatbot] = useState(false);
-  const [chatbotQuery, setChatbotQuery] = useState('');
-
   const handleSearch = (query) => {
     console.log('Search query:', query);
     // Implement search functionality
-  };
-
-  const handleChatbot = (query) => {
-    setChatbotQuery(query);
-    setShowChatbot(true);
-  };
-
-  const closeChatbot = () => {
-    setShowChatbot(false);
-    setChatbotQuery('');
   };
 
   const renderFeatureIcon = (iconColor) => {
@@ -72,7 +58,6 @@ const Landing = () => {
 
               <SearchBar 
                 onSearch={handleSearch}
-                onChatbot={handleChatbot}
                 placeholder="Hi! What can I help you find today?"
               />
             </div>
@@ -105,13 +90,7 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Chatbot Modal */}
-        {showChatbot && (
-          <Chatbot 
-            initialQuery={chatbotQuery}
-            onClose={closeChatbot}
-          />
-        )}
+        
       </main>
     </div>
   );
