@@ -16,87 +16,124 @@ const Logo = ({ size = 'default', showText = true }) => {
 
   return (
     <div className="flex items-center space-x-3 logo-container group">
-      {/* Warm Minimalist Logo */}
+      {/* AI Shopping Assistant Logo */}
       <div className="relative">
         <svg 
           width="40" 
           height="40" 
           viewBox="0 0 40 40" 
-          className={`text-amber-600 logo-svg transition-all duration-300 ${sizeClasses[size]}`}
+          className={`text-blue-600 logo-svg transition-all duration-300 ${sizeClasses[size]} group-hover:scale-105`}
           fill="currentColor"
         >
-          {/* Outer rounded square with warm gradient */}
-          <rect 
-            x="2" 
-            y="2" 
-            width="36" 
-            height="36" 
-            rx="8" 
-            fill="url(#warmGradient)" 
-            stroke="currentColor" 
-            strokeWidth="1.5"
+          {/* Main circular background with gradient */}
+          <circle 
+            cx="20" 
+            cy="20" 
+            r="18" 
+            fill="url(#aiGradient)" 
+            stroke="url(#borderGradient)" 
+            strokeWidth="2"
           />
           
-          {/* Inner geometric pattern - abstract house/shelter symbol */}
+          {/* Shopping cart body */}
           <path 
-            d="M12 28 L12 18 L20 12 L28 18 L28 28 Z" 
-            fill="url(#lightGradient)" 
+            d="M8 10 L12 10 L14 22 L28 22 L30 14 L16 14" 
+            fill="none" 
+            stroke="#ffffff" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
             opacity="0.9"
           />
           
-          {/* Central element - stylized "A" */}
-          <path 
-            d="M16 24 L18 18 L22 18 L24 24 M18.5 21 L21.5 21" 
-            stroke="#8B4513" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            fill="none"
+          {/* Cart wheels */}
+          <circle cx="16" cy="26" r="1.5" fill="#ffffff" opacity="0.9" />
+          <circle cx="26" cy="26" r="1.5" fill="#ffffff" opacity="0.9" />
+          
+          {/* AI Brain circuits overlay */}
+          <g opacity="0.8">
+            {/* Neural network nodes */}
+            <circle cx="20" cy="12" r="1" fill="#60A5FA" />
+            <circle cx="16" cy="16" r="1" fill="#60A5FA" />
+            <circle cx="24" cy="16" r="1" fill="#60A5FA" />
+            <circle cx="20" cy="20" r="1" fill="#60A5FA" />
+            
+            {/* Neural connections */}
+            <line x1="20" y1="12" x2="16" y2="16" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
+            <line x1="20" y1="12" x2="24" y2="16" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
+            <line x1="16" y1="16" x2="20" y2="20" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
+            <line x1="24" y1="16" x2="20" y2="20" stroke="#60A5FA" strokeWidth="0.8" opacity="0.6" />
+          </g>
+          
+          {/* AI Chip/Processor symbol */}
+          <rect 
+            x="17" 
+            y="7" 
+            width="6" 
+            height="6" 
+            rx="1" 
+            fill="url(#chipGradient)" 
+            stroke="#ffffff" 
+            strokeWidth="0.5"
           />
           
-          {/* Decorative dots in corners */}
-          <circle cx="8" cy="8" r="1.5" fill="#D2691E" opacity="0.7" />
-          <circle cx="32" cy="8" r="1.5" fill="#D2691E" opacity="0.7" />
-          <circle cx="8" cy="32" r="1.5" fill="#D2691E" opacity="0.7" />
-          <circle cx="32" cy="32" r="1.5" fill="#D2691E" opacity="0.7" />
+          {/* Chip pins */}
+          <line x1="15" y1="9" x2="17" y2="9" stroke="#ffffff" strokeWidth="0.5" />
+          <line x1="15" y1="11" x2="17" y2="11" stroke="#ffffff" strokeWidth="0.5" />
+          <line x1="23" y1="9" x2="25" y2="9" stroke="#ffffff" strokeWidth="0.5" />
+          <line x1="23" y1="11" x2="25" y2="11" stroke="#ffffff" strokeWidth="0.5" />
+          
+          {/* Search/Magnifying glass */}
+          <circle cx="32" cy="8" r="3" fill="none" stroke="#FFD700" strokeWidth="1.5" opacity="0.8" />
+          <line x1="34.5" y1="10.5" x2="37" y2="13" stroke="#FFD700" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
+          
+          {/* Price tag */}
+          <path 
+            d="M6 30 L10 30 L12 28 L10 26 L6 26 Z" 
+            fill="#FF6B6B" 
+            opacity="0.8"
+          />
+          <circle cx="8" cy="28" r="0.5" fill="#ffffff" />
           
           {/* Gradient definitions */}
           <defs>
-            {/* Main warm gradient */}
-            <linearGradient id="warmGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#F4A460" />
-              <stop offset="25%" stopColor="#D2691E" />
-              <stop offset="50%" stopColor="#CD853F" />
-              <stop offset="75%" stopColor="#A0522D" />
-              <stop offset="100%" stopColor="#8B4513" />
+            {/* Main AI gradient */}
+            <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="25%" stopColor="#2563EB" />
+              <stop offset="50%" stopColor="#1D4ED8" />
+              <stop offset="75%" stopColor="#1E40AF" />
+              <stop offset="100%" stopColor="#1E3A8A" />
             </linearGradient>
             
-            {/* Light cream gradient for inner shape */}
-            <linearGradient id="lightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FFF8DC" />
-              <stop offset="50%" stopColor="#F5DEB3" />
-              <stop offset="100%" stopColor="#DEB887" />
+            {/* Border gradient */}
+            <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#60A5FA" />
+              <stop offset="50%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#1D4ED8" />
             </linearGradient>
             
-            {/* Hover effect gradient */}
-            <radialGradient id="hoverWarmGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#FFE4B5" />
-              <stop offset="100%" stopColor="#F4A460" />
-            </radialGradient>
+            {/* Chip gradient */}
+            <linearGradient id="chipGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#10B981" />
+              <stop offset="100%" stopColor="#059669" />
+            </linearGradient>
           </defs>
         </svg>
         
-        {/* Warm glow effect */}
-        <div className="absolute inset-0 rounded-lg bg-amber-400 opacity-10 blur-md -z-10 logo-glow group-hover:opacity-30 group-hover:scale-110 transition-all duration-300"></div>
+        {/* Animated glow effect */}
+        <div className="absolute inset-0 rounded-full bg-blue-400 opacity-20 blur-md -z-10 logo-glow group-hover:opacity-40 group-hover:scale-110 transition-all duration-300 animate-pulse"></div>
       </div>
       
-      {/* Brand name with warm color scheme */}
+      {/* Brand name with tech-inspired styling */}
       {showText && (
         <div className="flex flex-col brand-text">
-          <div className={`font-bold bg-gradient-to-r from-amber-700 via-orange-600 to-amber-800 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
+          <div className={`font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
             AK-47
           </div>
-          <div className="text-xs text-amber-600 font-medium tracking-wide uppercase">
-            AI Assistant
+          <div className="text-xs text-blue-600 font-medium tracking-wide uppercase flex items-center space-x-1">
+            <span className="inline-block w-1 h-1 bg-green-500 rounded-full animate-pulse"></span>
+            <span>AI Shopping Assistant</span>
           </div>
         </div>
       )}
