@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import { authAPI, googleLogin } from '../utils/api';
 
@@ -15,6 +15,7 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -68,7 +69,11 @@ const Signup = () => {
       
       // Wait a moment to show success message, then redirect
       setTimeout(() => {
-        navigate('/login');
+        if (location.state?.from === '/chat' && location.state?.chatSession) {
+          navigate('/chat', { state: { chatSession: location.state.chatSession } });
+        } else {
+          navigate('/login');
+        }
       }, 2000);
       
     } catch (error) {
