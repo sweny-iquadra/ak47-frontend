@@ -1,10 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
+import { isAuthenticated, getCurrentUser } from '../utils/api';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
+  const [loggedIn, setLoggedIn] = useState(isAuthenticated());
+  const [user, setUser] = useState(getCurrentUser());
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // TODO: Authentication check - uncomment when ready to implement
   /*
@@ -29,94 +33,104 @@ const ProductDetails = () => {
     console.log('Buy now clicked');
   };
 
+  const handleLogoClick = () => {
+    // Check if user has recent chat sessions
+    const hasRecentChat = localStorage.getItem('recentChatSession') ||
+                         sessionStorage.getItem('chatSessionId') ||
+                         localStorage.getItem('lastChatTime');
+    
+    if (hasRecentChat) {
+      // Redirect to chatbot with session history
+      navigate('/chat');
+    } else {
+      // Redirect to landing page
+      navigate('/');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLoggedIn(false);
+    setUser(null);
+    setDropdownOpen(false);
+    navigate('/login');
+  };
+
+  const avatarUrl = user && user.avatar ? user.avatar : null;
+  const avatarLetter = user && user.full_name
+    ? user.full_name[0].toUpperCase()
+    : (user && user.username ? user.username[0].toUpperCase() : 'U');
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo and Navigation Links grouped together */}
-            <div className="flex items-center space-x-8">
-              {/* Logo */}
-              <div className="flex items-center">
+            {/* Left: Logo (always visible, clickable) */}
+            <div className="flex items-center">
+              <button 
+                onClick={handleLogoClick}
+                className="flex items-center hover:opacity-80 transition-opacity duration-200 focus:outline-none"
+                aria-label="AK-47 Home"
+              >
                 <Logo size="default" showText={true} />
-              </div>
-
-              {/* Navigation Links - Home and Smart Shopper */}
-              <nav className="hidden md:flex items-center space-x-6">
-                <Link 
-                  to="/"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md hover:bg-gray-50"
-                >
-                  Home
-                </Link>
-                <Link 
-                  to="/chat"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md hover:bg-gray-50"
-                >
-                  Smart Shopper
-                </Link>
-              </nav>
+              </button>
             </div>
-
-            {/* Right side icons with better spacing */}
-            <div className="flex items-center space-x-3">
-              {/* Search icon */}
-              <button className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-50 transition-colors duration-200">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-              
-              {/* Wishlist icon */}
-              <button className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-50 transition-colors duration-200">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </button>
-              
-              {/* Cart icon */}
-              <button className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-50 transition-colors duration-200">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-                </svg>
-              </button>
-              
-              {/* Profile */}
-              <div 
-                onClick={() => {
-                  // TODO: Authentication check - uncomment when ready to implement
-                  /*
-                  const token = localStorage.getItem('token');
-                  const user = localStorage.getItem('user');
-                  
-                  if (token && user) {
-                    navigate('/profile');
-                  } else {
-                    navigate('/login');
-                  }
-                  */
-                  
-                  // For now, always navigate to profile (comment out when implementing auth)
-                  navigate('/profile');
-                }}
-                className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center ml-2 hover:bg-amber-600 transition-colors duration-200 cursor-pointer"
-              >
-                <span className="text-white text-sm font-medium">U</span>
-              </div>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                type="button"
-                className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber-500 p-2 rounded-md"
-              >
-                <span className="sr-only">Open main menu</span>
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
+            {/* Right: Auth/User Section */}
+            <div className="flex items-center space-x-3 relative">
+              {!loggedIn ? (
+                <Link
+                  to="/login"
+                  className="text-amber-600 hover:text-amber-700 px-4 py-2 rounded font-medium border border-amber-60 hover:bg-amber-50 transition-colors duration-200"
+                >
+                  Login
+                </Link>
+              ) : (
+                <div className="relative">
+                  <button
+                    onClick={() => setDropdownOpen((open) => !open)}
+                    className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    aria-label="User menu"
+                  >
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      avatarLetter
+                    )}
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
+                      <div className="px-4 py-2 text-gray-700 text-semibold border-b">
+                        {user && user.full_name ? user.full_name : user && user.username ? user.username : 'User'}
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        {/* Profile Icon */}
+                        <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A9 9 0 1112 21a9 9 0 00-6.879-6.879z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        {/* Logout Icon */}
+                        <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-22" />
+                        </svg>
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -246,53 +260,30 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* Pricing Section */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Pricing
-          </h2>
-          <p className="text-gray-600 mb-6">
-            The Nova X500 is available for $799.99. Price may vary depending on retailer promotions and discounts.
-          </p>
+        {/* Pricing and Action */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-2xl font-bold text-gray-900">Free shipping</p>
+              <p className="text-sm text-gray-500">Ready to ship</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Weight: 185g</p>
+              <p className="text-sm text-green-600 font-medium">Ready to ship</p>
+            </div>
+          </div>
           
-          {/* TODO: Authentication check - uncomment when ready to implement */}
-          {/*
-          {(() => {
-            const token = localStorage.getItem('token');
-            const user = localStorage.getItem('user');
-            
-            if (token && user) {
-              return (
-                <button
-                  onClick={handleBuyNow}
-                  className="w-full max-w-sm bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
-                >
-                  Buy Now
-                </button>
-              );
-            } else {
-              return (
-                <div className="space-y-4">
-                  <p className="text-gray-600 text-sm">Please log in to purchase this item</p>
-                  <Link
-                    to="/login"
-                    className="inline-block w-full max-w-sm bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg text-center"
-                  >
-                    Login to Buy
-                  </Link>
-                </div>
-              );
-            }
-          })()}
-          */}
-          
-          {/* For now, show Buy Now button for everyone (comment out when implementing auth) */}
-          <button
-            onClick={handleBuyNow}
-            className="w-full max-w-sm bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-8 rounded-lg text-lg transition-colors duration-200 shadow-md hover:shadow-lg"
-          >
-            Buy Now
-          </button>
+          <div className="flex space-x-4">
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 bg-amber-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-amber-700 transition-colors duration-200"
+            >
+              Buy Now
+            </button>
+            <button className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
+              Add to Cart
+            </button>
+          </div>
         </div>
       </main>
     </div>

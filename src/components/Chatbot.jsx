@@ -1,165 +1,196 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Logo from './Logo';
+import { chatAPI, isAuthenticated, getCurrentUser } from '../utils/api';
 
 const Chatbot = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [message, setMessage] = useState('');
-  const [priceRange, setPriceRange] = useState([0, 1500]);
-  const [filters, setFilters] = useState({
-    brand: 'Any',
-    screenSize: 'Any',
-    processor: 'Any',
-    ram: 'Any',
-    storage: 'Any',
-    graphicsCard: 'Any'
-  });
+  const [sessionId, setSessionId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [filters, setFilters] = useState({});
+  const [requiresLogin, setRequiresLogin] = useState(false);
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+  const [loggedIn, setLoggedIn] = useState(isAuthenticated());
+  const [user, setUser] = useState(getCurrentUser());
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Sample chat messages
-  const [messages] = useState([
-    {
-      id: 1,
-      sender: 'AI Assistant',
-      text: "Hi there! I'm your AI assistant. How can I help you today?",
-      avatar: '🤖'
-    },
-    {
-      id: 2,
-      sender: 'User',
-      text: "I'm looking for a new laptop.",
-      avatar: '👤'
-    },
-    {
-      id: 3,
-      sender: 'AI Assistant',
-      text: "Great! What are you planning to use the laptop for?",
-      avatar: '🤖'
-    },
-    {
-      id: 4,
-      sender: 'User',
-      text: "Mostly for work and some light gaming.",
-      avatar: '👤'
-    },
-    {
-      id: 5,
-      sender: 'AI Assistant',
-      text: "Got it. Do you have a preferred screen size or budget?",
-      avatar: '🤖'
-    },
-    {
-      id: 6,
-      sender: 'User',
-      text: "Around 15 inches and a budget of $1500.",
-      avatar: '👤'
-    },
-    {
-      id: 7,
-      sender: 'AI Assistant',
-      text: "Okay, I'll find some options that fit your criteria. Please wait a moment.",
-      avatar: '🤖'
-    },
-    {
-      id: 8,
-      sender: 'AI Assistant',
-      text: "Here are a few laptops that match your requirements:",
-      avatar: '🤖'
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Keep input focused after messages are added or loading changes
+  useEffect(() => {
+    if (inputRef.current && !loading) {
+      inputRef.current.focus();
     }
-  ]);
+  }, [messages, loading]);
 
-  // Sample product recommendations
-  const [products] = useState([
-    {
-      id: 1,
-      name: 'TechPro X15',
-      specs: '15.6 inch, Intel Core i7, 16GB RAM, 512GB SSD, NVIDIA GeForce RTX 3060',
-      image: '/api/placeholder/120/80',
-      action: 'View Product'
-    },
-    {
-      id: 2,
-      name: 'UltraBook Pro 15',
-      specs: '15.6 inch, AMD Ryzen 7, 16GB RAM, 512GB SSD, AMD Radeon RX 6600M',
-      image: '/api/placeholder/120/80',
-      action: 'View Product'
-    },
-    {
-      id: 3,
-      name: 'ZenithBook 15',
-      specs: '15.6 inch, Intel Core i5, 16GB RAM, 512GB SSD, Intel Iris Xe Graphics',
-      image: '/api/placeholder/120/80',
-      action: 'View Product'
+  // Initialize chat session when component mounts or searchQuery changes
+  useEffect(() => {
+    // Restore chat state if present in location.state
+    if (location.state?.chatSession) {
+      const { sessionId, messages, products, filters } = location.state.chatSession;
+      setSessionId(sessionId || null);
+      setMessages(messages || []);
+      setProducts(products || []);
+      setFilters(filters || {});
+      setRequiresLogin(false);
+      return;
     }
-  ]);
-
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (message.trim()) {
-      // TODO: Connect to backend API
-      /*
+    const initializeChat = async () => {
       try {
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: message,
-            filters: filters,
-            priceRange: priceRange
-          }),
-        });
-        const data = await response.json();
-        // Handle response and update messages
-      } catch (error) {
-        console.error('Error sending message:', error);
+        setLoading(true);
+        setError(null);
+        let category = 'general';
+        if (location.state?.searchQuery) {
+          category = location.state.searchQuery.toLowerCase().trim();
+        }
+        const sessionResponse = await chatAPI.startSession(category);
+        setSessionId(sessionResponse.session_id);
+        setMessages([
+          {
+            sender: 'bot',
+            text: sessionResponse.message,
+            step: sessionResponse.step || null
+          }
+        ]);
+        setProducts(sessionResponse.products || []);
+        setFilters(sessionResponse.filters || {});
+        setRequiresLogin(!!sessionResponse.requires_login);
+        
+        // Store session info for logo click detection
+        localStorage.setItem('recentChatSession', 'true');
+        sessionStorage.setItem('chatSessionId', sessionResponse.session_id);
+        localStorage.setItem('lastChatTime', new Date().toISOString());
+        
+        // If there's a search query, send it as the first message
+        if (location.state?.searchQuery) {
+          const searchQuery = location.state.searchQuery;
+          setMessages(prev => [
+            ...prev,
+            { sender: 'user', text: searchQuery }
+          ]);
+          const messageResponse = await chatAPI.sendMessage(sessionResponse.session_id, searchQuery);
+          handleMessageResponse(messageResponse);
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to start chat session.');
+        setMessages([
+          {
+            sender: 'bot',
+            text: 'Sorry, I encountered an error. Please try again.'
+          }
+        ]);
+      } finally {
+        setLoading(false);
       }
-      */
-      setMessage('');
-    }
-  };
+    };
+    initializeChat();
+    // eslint-disable-next-line
+  }, [location.state?.searchQuery]);
 
-  const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({
+  // Helper function to handle message responses
+  const handleMessageResponse = (response) => {
+    setMessages(prev => [
       ...prev,
-      [filterType]: value
-    }));
+      {
+        sender: 'bot',
+        text: response.message,
+        step: response.step || null
+      }
+    ]);
+    if (response.session_id) setSessionId(response.session_id);
+    setProducts(response.products || []);
+    setFilters(response.filters || {});
+    setRequiresLogin(!!response.requires_login);
   };
 
-  const applyFilters = () => {
-    // TODO: Apply filters and refresh results
-    /*
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!message.trim() || !sessionId) return;
+    setError(null);
+    const userMsg = { sender: 'user', text: message };
+    setMessages(prev => [...prev, userMsg]);
+    setMessage('');
+    setLoading(true);
     try {
-      const response = await fetch('/api/filter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          filters: filters,
-          priceRange: priceRange
-        }),
-      });
-      const data = await response.json();
-      // Handle filtered results
-    } catch (error) {
-      console.error('Error applying filters:', error);
+      const response = await chatAPI.sendMessage(sessionId, userMsg.text);
+      handleMessageResponse(response);
+    } catch (err) {
+      setMessages(prev => [
+        ...prev,
+        { sender: 'bot', text: err.message || 'Something went wrong.' }
+      ]);
+      setError(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+      if (inputRef.current) inputRef.current.focus();
     }
-    */
-    console.log('Applying filters:', filters, 'Price range:', priceRange);
   };
 
   const handleViewProduct = (productId) => {
-    // TODO: Implement authentication check
-    // const isLoggedIn = checkUserAuthentication(); // Replace with your actual authentication check
-    const isLoggedIn = true; // Comment out authentication check for now
-
-    if (isLoggedIn) {
-      navigate(`/product/${productId}`);
-    } else {
-      // Redirect to login or signup page
-      navigate('/login'); // Or /signup, depending on your preference
+    if (!isAuthenticated()) {
+      alert('Please log in to view product details.');
+      navigate('/login', {
+        state: {
+          from: '/chat',
+          chatSession: {
+            sessionId,
+            messages,
+            products,
+            filters,
+            searchQuery: location.state?.searchQuery || null
+          }
+        }
+      });
+      return;
     }
+    navigate(`/product/${Number(productId)}`);
+  };
+
+  const handleLoginPrompt = () => {
+    navigate('/login', {
+      state: {
+        from: '/chat',
+        chatSession: {
+          sessionId,
+          messages,
+          products,
+          filters,
+          searchQuery: location.state?.searchQuery || null
+        }
+      }
+    });
+  };
+
+  const handleLogoClick = () => {
+    const hasRecentChat = localStorage.getItem('recentChatSession') ||
+      sessionStorage.getItem('chatSessionId') ||
+      localStorage.getItem('lastChatTime');
+    if (hasRecentChat) {
+      navigate('/chat');
+    } else {
+      navigate('/');
+    }
+  };
+  const avatarUrl = user && user.avatar ? user.avatar : null;
+  const avatarLetter = user && user.full_name
+    ? user.full_name[0].toUpperCase()
+    : (user && user.username ? user.username[0].toUpperCase() : 'U');
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLoggedIn(false);
+    setUser(null);
+    setDropdownOpen(false);
+    navigate('/login');
   };
 
   return (
@@ -168,188 +199,206 @@ const Chatbot = () => {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
+            {/* Left: Logo (always visible, clickable) */}
             <div className="flex items-center">
-              <Logo size="default" showText={true} />
-            </div>
-
-            {/* Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <button 
-                onClick={() => navigate('/')}
-                className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200"
+              <button
+                onClick={handleLogoClick}
+                className="flex items-center hover:opacity-80 transition-opacity duration-200 focus:outline-none"
+                aria-label="AK-47 Home"
               >
-                Home
+                <Logo size="default" showText={true} />
               </button>
-            </nav>
+            </div>
+            {/* Right: Auth/User Section */}
+            <div className="flex items-center space-x-3 relative">
+              {!loggedIn ? (
+                <Link
+                  to="/login"
+                  className="text-amber-600 hover:text-amber-700 px-4 py-2 rounded font-medium border border-amber-600 hover:bg-amber-50 transition-colors duration-200"
+                >
+                  Login
+                </Link>
+              ) : (
+                <div className="relative">
+                  <button
+                    onClick={() => setDropdownOpen((open) => !open)}
+                    className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    aria-label="User menu"
+                  >
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      avatarLetter
+                    )}
+                  </button>
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
+                      <div className="px-4 py-2 text-gray-700 font-semibold border-b">
+                        {user && user.full_name ? user.full_name : user && user.username ? user.username : 'User'}
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        {/* Profile Icon */}
+                        <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A9 9 0 1112 21a9 9 0 01-6.879-3.196z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        {/* Logout Icon */}
+                        <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" />
+                        </svg>
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
-
       {/* Main Content */}
       <div className="flex-1 flex">
-        {/* Chat Section */}
         <div className="flex-1 flex flex-col">
-          {/* Chat Header */}
           <div className="bg-white border-b px-6 py-4">
             <h1 className="text-2xl font-bold text-gray-900">Chat with us</h1>
+            {sessionId && (
+              <p className="text-sm text-gray-600 mt-1">Session ID: {sessionId}</p>
+            )}
           </div>
-
-          {/* Messages Container */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {messages.map((msg) => (
-              <div key={msg.id} className="flex items-start space-x-3">
+            {messages.map((msg, idx) => (
+              <div key={idx} className="flex items-start space-x-3">
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-lg">
-                  {msg.avatar}
+                  {msg.sender === 'bot' ? '🤖' : '👤'}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
-                    <span className="text-sm font-medium text-gray-900">{msg.sender}</span>
+                    <span className="text-sm font-medium text-gray-900">{msg.sender === 'bot' ? 'AI Assistant' : 'You'}</span>
+                    {msg.step && (
+                      <span className="text-xs text-gray-500">({msg.step})</span>
+                    )}
                   </div>
-                  <div className={`inline-block px-4 py-2 rounded-lg max-w-md ${
-                    msg.sender === 'User' 
-                      ? 'bg-amber-400 text-black ml-auto' 
-                      : 'bg-gray-100 text-gray-900'
-                  }`}>
+                  <div className={`inline-block px-4 py-2 rounded-lg max-w-md ${msg.sender === 'user' ? 'bg-amber-400 text-black ml-auto' : 'bg-gray-100 text-gray-900'}`}>
                     {msg.text}
                   </div>
                 </div>
-                {msg.sender === 'User' && (
-                  <div className="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center text-lg">
-                    👤
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+            {/* Product Recommendations */}
+            {products.length > 0 && (
+              <div className="space-y-4 mt-6">
+                {!isAuthenticated() && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M18 10A8 8 0 11 2 10a8 8 0 0116 0zm-8-4a1 1 0 100 2 1 1 0 000-2zm2 8a1 1 0 10-2 0v-4a1 1 0 112 0v4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-blue-700">
+                          <strong>Login required:</strong> You need to be logged in to view product details.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
+                {products.map((product) => (
+                  <div key={product.id} className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-4">
+                    <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center">
+                      {product.image_url && (
+                        <img src={Array.isArray(product.image_url) ? product.image_url[0] : product.image_url} alt={product.name} className="w-16 h-12 object-cover rounded" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                      <p className="text-sm text-gray-600">{product.description}</p>
+                      <button 
+                        onClick={() => handleViewProduct(product.id)}
+                        className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 text-sm font-medium transition-colors duration-200"
+                      >View Product</button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-
-            {/* Product Recommendations */}
-            <div className="space-y-4 mt-6">
-              {products.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-4">
-                  <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center">
-                    <div className="w-16 h-12 bg-gray-300 rounded"></div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{product.specs}</p>
-                    <button 
-                      onClick={() => handleViewProduct(product.id)}
-                      className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 text-sm font-medium transition-colors duration-200"
-                    >
-                      {product.action}
-                    </button>
-                  </div>
+            )}
+            {/* Filters UI (if present) */}
+            {filters && Object.keys(filters).length > 0 && (
+              <div className="mt-6">
+                <h2 className="text-lg font-semibold mb-2">Filters</h2>
+                <div className="flex flex-wrap gap-4">
+                  {Object.entries(filters).map(([key, value]) => (
+                    <div key={key} className="flex flex-col">
+                      <label className="text-sm font-medium text-gray-700 mb-1">
+                        {key.charAt(0).toUpperCase() + key.slice(1)}
+                      </label>
+                      <input
+                        className="border rounded px-2 py-1"
+                        value={value}
+                        onChange={e => setFilters((prev) => ({ ...prev, [key]: e.target.value }))}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
-
           {/* Message Input */}
           <div className="bg-white border-t p-4">
+            {error && (
+              <div
+                className="mb-2 text-red-600 font-medium animate-pulse"
+                aria-live="assertive"
+                role="alert"
+              >
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full bg-amber-400 flex items-center justify-center">
-                👤
+                <span role="img" aria-label="User">👤</span>
               </div>
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-                />
+              <input
+                type="text"
+                className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-gray-500"
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                disabled={loading || requiresLogin}
+                ref={inputRef}
+                aria-invalid={!!error}
+                aria-describedby={error ? 'chatbot-error' : undefined}
+                autoFocus
+                placeholder="Type your message..."
+              />
+              <button
+                type="submit"
+                className="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !message.trim() || requiresLogin}
+              >
+                {loading ? 'Sending...' : 'Send'}
+              </button>
+            </form>
+            {requiresLogin && (
+              <div className="mt-2 text-center">
                 <button
-                  type="submit"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={handleLoginPrompt}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 text-sm font-medium transition-colors duration-200"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
+                  Login to Continue Chat
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-
-        {/* Filters Sidebar */}
-        <div className="w-80 bg-white border-l p-6 overflow-y-auto">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Filters</h2>
-
-          {/* Filter Dropdowns */}
-          <div className="space-y-4">
-            {Object.entries({
-              brand: 'Brand',
-              screenSize: 'Screen Size', 
-              processor: 'Processor',
-              ram: 'RAM',
-              storage: 'Storage',
-              graphicsCard: 'Graphics Card'
-            }).map(([key, label]) => (
-              <div key={key}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {label}
-                </label>
-                <select
-                  value={filters[key]}
-                  onChange={(e) => handleFilterChange(key, e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent appearance-none bg-white"
-                >
-                  <option value="Any">Any</option>
-                  {key === 'brand' && (
-                    <>
-                      <option value="Apple">Apple</option>
-                      <option value="Dell">Dell</option>
-                      <option value="HP">HP</option>
-                      <option value="Lenovo">Lenovo</option>
-                    </>
-                  )}
-                  {key === 'screenSize' && (
-                    <>
-                      <option value="13 inch">13 inch</option>
-                      <option value="15 inch">15 inch</option>
-                      <option value="17 inch">17 inch</option>
-                    </>
-                  )}
-                  {key === 'processor' && (
-                    <>
-                      <option value="Intel i5">Intel i5</option>
-                      <option value="Intel i7">Intel i7</option>
-                      <option value="AMD Ryzen 5">AMD Ryzen 5</option>
-                      <option value="AMD Ryzen 7">AMD Ryzen 7</option>
-                    </>
-                  )}
-                </select>
-              </div>
-            ))}
-
-            {/* Price Range Slider */}
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price Range
-              </label>
-              <div className="px-3">
-                <input
-                  type="range"
-                  min="0"
-                  max="3000"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer slider"
-                />
-                <div className="flex justify-between text-sm text-gray-600 mt-2">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Apply Filters Button */}
-            <button
-              onClick={applyFilters}
-              className="w-full mt-6 bg-amber-400 text-black font-medium py-3 px-4 rounded-lg hover:bg-amber-500 transition-colors duration-200"
-            >
-              Apply Filters
-            </button>
+            )}
           </div>
         </div>
       </div>
@@ -357,4 +406,4 @@ const Chatbot = () => {
   );
 };
 
-export default Chatbot;
+export default Chatbot; 

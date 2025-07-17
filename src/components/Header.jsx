@@ -42,6 +42,20 @@ const Header = () => {
     navigate('/login');
   };
 
+  const handleLogoClick = () => {
+    const hasRecentChat = localStorage.getItem('recentChatSession') ||
+                         sessionStorage.getItem('chatSessionId') ||
+                         localStorage.getItem('lastChatTime');
+
+    if (hasRecentChat && loggedIn) {
+      // Redirect to chatbot with session history
+      navigate('/chat');
+    } else {
+      // Redirect to landing page
+      navigate('/');
+    }
+  };
+
   const avatarUrl = user && user.avatar ? user.avatar : null; // or user.profile_image
   const avatarLetter = user && user.full_name
     ? user.full_name[0].toUpperCase()
@@ -51,42 +65,35 @@ const Header = () => {
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Left: Logo (always visible, clickable) */}
           <div className="flex items-center">
-            <Link to="/">
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center hover:opacity-80 transition-opacity duration-200 focus:outline-none"
+              aria-label="AK-47 Home"
+            >
               <Logo size="default" showText={true} />
-            </Link>
+            </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200">
-              Home
-            </Link>
-            <Link to="/chat" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200">
-              Smart Shopper
-            </Link>
-            <Link to="/products" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors duration-200">
-              Products
-            </Link>
-            {/* Add more links as needed */}
-          </nav>
-
-          {/* Auth/User Section */}
+          {/* Right: Auth/User Section */}
           <div className="flex items-center space-x-3 relative">
             {!loggedIn ? (
-              <Link to="/login" className="text-amber-600 hover:text-amber-700 px-4 py-2 rounded font-medium border border-amber-600 hover:bg-amber-50 transition">
+              <Link
+                to="/login"
+                className="text-amber-600 hover:text-amber-700 px-4 py-2 rounded font-medium border border-amber-600 hover:bg-amber-50 transition-colors duration-200"
+              >
                 Login
               </Link>
             ) : (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen((open) => !open)}
-                  className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold focus:outline-none focus:ring-2 focus:ring-amber-400"
                   aria-label="User menu"
                 >
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+                    <img src={avatarUrl} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
                   ) : (
                     avatarLetter
                   )}

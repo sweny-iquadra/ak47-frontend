@@ -7,7 +7,6 @@ const Landing = () => {
   const navigate = useNavigate();
   
   const handleSearch = (query) => {
-    console.log('Search query:', query);
     navigate('/chat', { state: { searchQuery: query } });
   };
 
