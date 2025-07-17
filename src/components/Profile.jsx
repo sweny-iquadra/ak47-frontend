@@ -51,18 +51,8 @@ const Profile = () => {
   };
 
   const handleLogoClick = () => {
-    // Check if user has recent chat sessions
-    const hasRecentChat = localStorage.getItem('recentChatSession') ||
-                         sessionStorage.getItem('chatSessionId') ||
-                         localStorage.getItem('lastChatTime');
-    
-    if (hasRecentChat) {
-      // Redirect to chatbot with session history
-      navigate('/chat');
-    } else {
-      // Redirect to landing page
-      navigate('/');
-    }
+    // Always redirect to landing page
+    navigate('/');
   };
 
   const avatarUrl = user && user.avatar ? user.avatar : null;
