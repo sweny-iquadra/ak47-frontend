@@ -171,14 +171,8 @@ const Chatbot = () => {
   };
 
   const handleLogoClick = () => {
-    const hasRecentChat = localStorage.getItem('recentChatSession') ||
-      sessionStorage.getItem('chatSessionId') ||
-      localStorage.getItem('lastChatTime');
-    if (hasRecentChat) {
-      navigate('/chat');
-    } else {
-      navigate('/');
-    }
+    // Always redirect to landing page
+    navigate('/');
   };
   const avatarUrl = user && user.avatar ? user.avatar : null;
   const avatarLetter = user && user.full_name
@@ -271,9 +265,6 @@ const Chatbot = () => {
         <div className="flex-1 flex flex-col">
           <div className="bg-white border-b px-6 py-4">
             <h1 className="text-2xl font-bold text-gray-900">Chat with us</h1>
-            {sessionId && (
-              <p className="text-sm text-gray-600 mt-1">Session ID: {sessionId}</p>
-            )}
           </div>
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((msg, idx) => (

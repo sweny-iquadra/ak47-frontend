@@ -133,11 +133,11 @@ const Logo = ({ size = 'default', showText = true }) => {
                  WebkitBackgroundClip: 'text',
                  WebkitTextFillColor: 'transparent' 
                }}>
-            AK-47
+            A³
           </div>
           <div className="text-xs text-amber-600 font-medium tracking-wide uppercase flex items-center space-x-1">
             <span className="inline-block w-1 h-1 bg-amber-500 rounded-full animate-pulse"></span>
-            <span>AI Shopping Assistant</span>
+            <span>Anything Anywhere Anytime</span>
           </div>
         </div>
       )}

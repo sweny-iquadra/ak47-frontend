@@ -43,17 +43,8 @@ const Header = () => {
   };
 
   const handleLogoClick = () => {
-    const hasRecentChat = localStorage.getItem('recentChatSession') ||
-                         sessionStorage.getItem('chatSessionId') ||
-                         localStorage.getItem('lastChatTime');
-
-    if (hasRecentChat && loggedIn) {
-      // Redirect to chatbot with session history
-      navigate('/chat');
-    } else {
-      // Redirect to landing page
-      navigate('/');
-    }
+    // Always redirect to landing page
+    navigate('/');
   };
 
   const avatarUrl = user && user.avatar ? user.avatar : null; // or user.profile_image
