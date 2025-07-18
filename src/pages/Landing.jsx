@@ -5,9 +5,28 @@ import { Header, SearchBar, FeatureCard } from '../components';
 
 const Landing = () => {
   const navigate = useNavigate();
-  
-  const handleSearch = (query) => {
-    navigate('/chat', { state: { searchQuery: query } });
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSearch = async (query) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/chat/start-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ category: query })
+      });
+      if (!response.ok) {
+        throw new Error('Failed to start chat session');
+      }
+      const data = await response.json();
+      navigate('/chat', { state: { chatSession: data, searchQuery: query } });
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderFeatureIcon = (iconColor) => {
@@ -39,7 +58,7 @@ const Landing = () => {
       <main className="relative">
         <div className="relative h-96 md:h-[500px] lg:h-[600px]">
           {/* Background Image */}
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
               backgroundImage: `url('${HERO_CONTENT.backgroundImage}')`
@@ -58,9 +77,10 @@ const Landing = () => {
                 {HERO_CONTENT.subtitle}
               </p>
 
-              <SearchBar 
+              <SearchBar
                 onSearch={handleSearch}
                 placeholder="Hi! What can I help you find today?"
+                loading={loading}
               />
             </div>
           </div>
@@ -92,7 +112,7 @@ const Landing = () => {
           </div>
         </section>
 
-        
+
       </main>
     </div>
   );

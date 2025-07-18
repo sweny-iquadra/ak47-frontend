@@ -1,14 +1,21 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import { isAuthenticated, getCurrentUser } from '../utils/api';
 
 const ProductDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loggedIn, setLoggedIn] = useState(isAuthenticated());
   const [user, setUser] = useState(getCurrentUser());
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const product = location.state?.product;
+  console.log("product details ", product);
+  if (!product) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">No product data available.</div>;
+  }
 
   // TODO: Authentication check - uncomment when ready to implement
   /*
@@ -29,8 +36,8 @@ const ProductDetails = () => {
   */
 
   const handleBuyNow = () => {
-    // TODO: Implement buy now functionality
-    console.log('Buy now clicked');
+    const url = product.product_url;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleLogoClick = () => {
@@ -52,6 +59,31 @@ const ProductDetails = () => {
     ? user.full_name[0].toUpperCase()
     : (user && user.username ? user.username[0].toUpperCase() : 'U');
 
+  // Optionally, filter out fields you don't want to show
+  const hiddenFields = ["id", "created_at", "updated_at", "__v"];
+
+  // Helper for dynamic specifications
+  const getSpecs = () => {
+    if (product.specifications && typeof product.specifications === 'object') {
+      // If specifications is an object or array, return entries
+      return Array.isArray(product.specifications)
+        ? product.specifications
+        : Object.entries(product.specifications).map(([key, value]) => ({ key, value }));
+    }
+    // Otherwise, try to infer specs from product fields
+    const specKeys = [
+      "display", "ram", "camera", "operating_system", "processor", "storage", "battery", "weight"
+    ];
+    return specKeys
+      .filter((key) => product[key])
+      .map((key) => ({ key, value: product[key] }));
+  };
+  const specs = getSpecs();
+
+  // Helper for images
+  const mainImage = product.image_url || null;
+  const sideImages = product.images?.slice(1, 3) || [];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -60,7 +92,7 @@ const ProductDetails = () => {
           <div className="flex justify-between items-center h-16">
             {/* Left: Logo (always visible, clickable) */}
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={handleLogoClick}
                 className="flex items-center hover:opacity-80 transition-opacity duration-200 focus:outline-none"
                 aria-label="AK-47 Home"
@@ -136,142 +168,149 @@ const ProductDetails = () => {
                 Home
               </Link>
             </li>
-            <li className="flex items-center">
-              <svg className="flex-shrink-0 h-4 w-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-              </svg>
-              <span className="hover:text-gray-700">Electronics</span>
-            </li>
-            <li className="flex items-center">
-              <svg className="flex-shrink-0 h-4 w-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-              </svg>
-              <span className="text-gray-900">Smartphones</span>
-            </li>
+            {product.category && (
+              <li className="flex items-center">
+                <svg className="flex-shrink-0 h-4 w-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+                <span className="hover:text-gray-700">{product.category}</span>
+              </li>
+            )}
+            {product.subcategory && (
+              <li className="flex items-center">
+                <svg className="flex-shrink-0 h-4 w-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+                <span className="text-gray-900">{product.subcategory}</span>
+              </li>
+            )}
           </ol>
         </nav>
 
         {/* Product Title */}
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Nova X500 Smartphone
+          {product.name || product.title || "Product Details"}
         </h1>
 
         {/* Product Overview */}
-        <p className="text-gray-600 mb-8 max-w-4xl">
-          Experience the future with the Nova X500, featuring a stunning display, powerful processor, and advanced camera system.
-        </p>
+        {product.description && (
+          <p className="text-gray-600 mb-8 max-w-4xl">{product.description}</p>
+        )}
 
         {/* Product Images Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Main Image */}
           <div className="bg-gradient-to-br from-orange-200 to-pink-300 rounded-lg p-8 flex items-center justify-center">
-            <div className="w-64 h-96 bg-black rounded-3xl p-2 shadow-2xl">
-              <div className="w-full h-full bg-gradient-to-br from-orange-400 via-pink-400 to-purple-500 rounded-2xl"></div>
-            </div>
+            {mainImage ? (
+              <img src={mainImage} alt={product.name || "Product"} className="w-64 h-96 object-cover rounded-3xl shadow-2xl" />
+            ) : (
+              <div className="w-64 h-96 bg-black rounded-3xl p-2 shadow-2xl flex items-center justify-center text-white">No Image</div>
+            )}
           </div>
 
           {/* Side Images */}
           <div className="grid grid-cols-1 gap-4">
-            {/* Back view */}
-            <div className="bg-gradient-to-br from-teal-400 to-blue-600 rounded-lg p-6 flex items-center justify-center h-48">
-              <div className="w-24 h-40 bg-gradient-to-b from-teal-600 to-blue-700 rounded-xl shadow-lg flex items-center justify-center">
-                <span className="text-white text-xs font-medium">nova</span>
-              </div>
-            </div>
-
-            {/* Side view */}
-            <div className="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-48">
-              <div className="w-40 h-8 bg-gradient-to-r from-gray-300 to-gray-500 rounded-full shadow-md"></div>
-            </div>
+            {sideImages.length > 0 ? (
+              sideImages.map((img, idx) => (
+                <div key={idx} className="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-48">
+                  <img src={img} alt={`Product view ${idx + 2}`} className="h-40 object-cover rounded-xl" />
+                </div>
+              ))
+            ) : (
+              <div className="bg-gray-100 rounded-lg p-6 flex items-center justify-center h-48 text-gray-400">No Additional Images</div>
+            )}
           </div>
         </div>
 
         {/* Product Overview Section */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Product Overview
-          </h2>
-          <p className="text-gray-600 leading-relaxed max-w-4xl">
-            The Nova X500 redefines smartphone technology with its edge-to-edge OLED display, lightning-fast octa-core processor, 
-            and a revolutionary 108MP camera. Its sleek design and durable build make it the perfect companion for your daily 
-            adventures.
-          </p>
-        </div>
+        {product.overview && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Overview</h2>
+            <p className="text-gray-600 leading-relaxed max-w-4xl">{product.overview}</p>
+          </div>
+        )}
 
         {/* Specifications */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Specifications
-          </h2>
-          
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-              {/* Left Column */}
-              <div className="space-y-4 p-6">
-                <div className="border-b border-gray-100 pb-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">Display</h3>
-                  <p className="text-gray-900">6.8" OLED, 120Hz</p>
+        {specs.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Specifications</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                {/* Left Column */}
+                <div className="space-y-4 p-6">
+                  {specs.filter((_, i) => i % 2 === 0).map((spec, idx) => (
+                    <div key={idx} className="border-b border-gray-100 pb-4">
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">{spec.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
+                      <p className="text-gray-900">{spec.value}</p>
+                    </div>
+                  ))}
                 </div>
-                
-                <div className="border-b border-gray-100 pb-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">RAM</h3>
-                  <p className="text-gray-900">12GB</p>
-                </div>
-                
-                <div className="border-b border-gray-100 pb-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">Camera</h3>
-                  <p className="text-gray-900">108MP + 12MP + 5MP</p>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">Operating System</h3>
-                  <p className="text-gray-900">Android 13</p>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-4 p-6 border-l border-gray-100">
-                <div className="border-b border-gray-100 pb-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">Processor</h3>
-                  <p className="text-gray-900">Octa-Core 3.2GHz</p>
-                </div>
-                
-                <div className="border-b border-gray-100 pb-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">Storage</h3>
-                  <p className="text-gray-900">256GB</p>
-                </div>
-                
-                <div className="border-b border-gray-100 pb-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-1">Battery</h3>
-                  <p className="text-gray-900">5000mAh</p>
+                {/* Right Column */}
+                <div className="space-y-4 p-6 border-l border-gray-100">
+                  {specs.filter((_, i) => i % 2 === 1).map((spec, idx) => (
+                    <div key={idx} className="border-b border-gray-100 pb-4">
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">{spec.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
+                      <p className="text-gray-900">{spec.value}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Attributes Section */}
+        {product.attributes && typeof product.attributes === 'object' && Object.keys(product.attributes).length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Attributes</h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                {Object.entries(product.attributes).map(([key, value], idx) => (
+                  <div key={idx} className="border-b border-gray-100 p-6">
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
+                    <p className="text-gray-900">
+                      {Array.isArray(value) ? value.join(', ') : String(value)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Pricing and Action */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-2xl font-bold text-gray-900">Free shipping</p>
-              <p className="text-sm text-gray-500">Ready to ship</p>
+              {product.price ? (
+                <p className="text-2xl font-bold text-gray-900">${product.price}</p>
+              ) : (
+                <p className="text-2xl font-bold text-gray-900">Price not available</p>
+              )}
+              {product.shipping_info ? (
+                <p className="text-sm text-gray-500">{product.shipping_info}</p>
+              ) : (
+                <p className="text-sm text-gray-500">Shipping info not available</p>
+              )}
+              {typeof product.taxes === 'number' && (
+                <p className="text-sm text-gray-500">Tax: ${product.taxes.toFixed(2)}</p>
+              )}
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-500">Weight: 185g</p>
-              <p className="text-sm text-green-600 font-medium">Ready to ship</p>
+              {product.weight && <p className="text-sm text-gray-500">Weight: {product.weight}</p>}
+              {product.availability ? (
+                <p className="text-sm text-green-600 font-medium">{product.availability}</p>
+              ) : (
+                <p className="text-sm text-green-600 font-medium">Availability unknown</p>
+              )}
             </div>
           </div>
-          
           <div className="flex space-x-4">
             <button
               onClick={handleBuyNow}
-              className="flex-1 bg-amber-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-amber-700 transition-colors duration-200"
+              className="bg-amber-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-amber-700 transition-colors duration-200"
             >
               Buy Now
-            </button>
-            <button className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200">
-              Add to Cart
             </button>
           </div>
         </div>

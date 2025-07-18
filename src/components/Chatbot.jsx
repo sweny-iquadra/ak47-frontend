@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Logo from './Logo';
 import { chatAPI, isAuthenticated, getCurrentUser } from '../utils/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const Chatbot = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Chatbot = () => {
 
   // Keep input focused after messages are added or loading changes
   useEffect(() => {
-    if (inputRef.current && !loading) {
+    if (inputRef.current) {
       inputRef.current.focus();
     }
   }, [messages, loading]);
@@ -36,11 +37,23 @@ const Chatbot = () => {
   useEffect(() => {
     // Restore chat state if present in location.state
     if (location.state?.chatSession) {
-      const { sessionId, messages, products, filters } = location.state.chatSession;
-      setSessionId(sessionId || null);
-      setMessages(messages || []);
+      const { messages, message, session_id, step, search_criteria, products, filters } = location.state.chatSession;
+      setSessionId(session_id || null);
+      if (Array.isArray(messages) && messages.length > 0) {
+        setMessages(messages);
+      } else if (message) {
+        setMessages([
+          {
+            sender: 'bot',
+            text: message,
+            step: step || null
+          }
+        ]);
+      } else {
+        setMessages([]);
+      }
       setProducts(products || []);
-      setFilters(filters || {});
+      setFilters(filters || search_criteria || {});
       setRequiresLogin(false);
       return;
     }
@@ -64,12 +77,12 @@ const Chatbot = () => {
         setProducts(sessionResponse.products || []);
         setFilters(sessionResponse.filters || {});
         setRequiresLogin(!!sessionResponse.requires_login);
-        
+
         // Store session info for logo click detection
         localStorage.setItem('recentChatSession', 'true');
         sessionStorage.setItem('chatSessionId', sessionResponse.session_id);
         localStorage.setItem('lastChatTime', new Date().toISOString());
-        
+
         // If there's a search query, send it as the first message
         if (location.state?.searchQuery) {
           const searchQuery = location.state.searchQuery;
@@ -135,24 +148,48 @@ const Chatbot = () => {
     }
   };
 
-  const handleViewProduct = (productId) => {
+  const handleViewProduct = async (productId) => {
     if (!isAuthenticated()) {
-      alert('Please log in to view product details.');
-      navigate('/login', {
-        state: {
-          from: '/chat',
-          chatSession: {
-            sessionId,
-            messages,
-            products,
-            filters,
-            searchQuery: location.state?.searchQuery || null
-          }
-        }
-      });
+      handleLoginPrompt();
       return;
     }
-    navigate(`/product/${Number(productId)}`);
+    try {
+      if (!productId) {
+        alert("Product ID is missing!");
+        return;
+      }
+      // If you need authentication, get the token from your auth context or localStorage
+      const token = localStorage.getItem("token"); // adjust as needed
+
+      const response = await fetch(
+        `${API_BASE_URL}/products/${productId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
+
+      if (!response.ok) {
+        // Handle error (e.g., show login prompt if 401)
+        if (response.status === 401) {
+          // Prompt login
+          alert("Please log in to view this product.");
+          // Optionally, redirect to login page
+          return;
+        }
+        throw new Error("Failed to fetch product");
+      }
+
+      const product = await response.json();
+      console.log("product ", product);
+      // Navigate to ProductDetails, passing product data via state
+      navigate(`/product-details/${product.id}`, { state: { product } });
+    } catch (error) {
+      console.error(error);
+      // Optionally show error to user
+    }
   };
 
   const handleLoginPrompt = () => {
@@ -160,11 +197,10 @@ const Chatbot = () => {
       state: {
         from: '/chat',
         chatSession: {
-          sessionId,
           messages,
+          session_id: sessionId,
           products,
           filters,
-          searchQuery: location.state?.searchQuery || null
         }
       }
     });
@@ -290,7 +326,7 @@ const Chatbot = () => {
             {products.length > 0 && (
               <div className="space-y-4 mt-6">
                 {!isAuthenticated() && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
                         <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
@@ -303,9 +339,13 @@ const Chatbot = () => {
                         </p>
                       </div>
                     </div>
+                    <button
+                      onClick={handleLoginPrompt}
+                      className="ml-4 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-medium transition-colors duration-200"
+                    >Login</button>
                   </div>
                 )}
-                {products.map((product) => (
+                {isAuthenticated() && products.map((product) => (
                   <div key={product.id} className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-4">
                     <div className="w-24 h-16 bg-gray-200 rounded flex items-center justify-center">
                       {product.image_url && (
@@ -315,7 +355,7 @@ const Chatbot = () => {
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900">{product.name}</h3>
                       <p className="text-sm text-gray-600">{product.description}</p>
-                      <button 
+                      <button
                         onClick={() => handleViewProduct(product.id)}
                         className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 text-sm font-medium transition-colors duration-200"
                       >View Product</button>
