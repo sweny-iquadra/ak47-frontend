@@ -14,7 +14,7 @@ function App() {
           <Route path="/chat" element={<Chatbot />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/product/:productId" element={<ProductDetails />} />
+          <Route path="/product-details/:id" element={<ProductDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login-success" element={<LoginSuccess />} />
         </Routes>
