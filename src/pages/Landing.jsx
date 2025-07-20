@@ -365,7 +365,32 @@ const CombinedLandingChatbot = () => {
   const [displayedSuggestions, setDisplayedSuggestions] = useState(getRandomSuggestions());
 
   const handleQuickStart = (option) => {
-    handleSearch(option.text);
+    // Pass the category instead of the text to the start-session endpoint
+    handleSearchWithCategory(option.category, option.text);
+  };
+
+  const handleSearchWithCategory = async (category, query) => {
+    setLoading(true);
+    setHasAttemptedLoadRecent(false); // Reset flag when starting new chat
+    try {
+      const sessionResponse = await chatAPI.startSession(category);
+      setSessionId(sessionResponse.session_id);
+      setMessages([
+        {
+          sender: 'bot',
+          text: sessionResponse.message,
+          step: sessionResponse.step || null
+        }
+      ]);
+      setProducts(sessionResponse.products || []);
+      setFilters(sessionResponse.filters || sessionResponse.search_criteria || {});
+      setRequiresLogin(!!sessionResponse.requires_login);
+      setChatStarted(true);
+    } catch (error) {
+      setError(error.message || 'Failed to start chat session.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
