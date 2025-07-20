@@ -336,80 +336,160 @@ const CombinedLandingChatbot = () => {
     }
   };
 
+  // Quick start options
+  const quickStartOptions = [
+    { text: "Find me a laptop under $800", icon: "💻" },
+    { text: "Show me trendy sneakers", icon: "👟" },
+    { text: "I need a birthday gift for my mom", icon: "🎁" },
+    { text: "Best deals on kitchen appliances", icon: "🍳" }
+  ];
+
+  const handleQuickStart = (option) => {
+    handleSearch(option.text);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
       <Header />
       
       <main className="flex-1 flex flex-col">
-        {!chatStarted && (
-          <div className="flex-1 flex items-center justify-center px-4 py-12">
-            <div className="w-full max-w-3xl text-center">
-              {/* AI Assistant Welcome */}
-              <div className="mb-12 space-y-6">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg mb-6">
-                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                
-                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Meet A³, Your AI Assistant
-                </h1>
-                
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  {HERO_CONTENT.subtitle}
-                </p>
-
-                {/* Loading indicator for recent conversations */}
-                {isAuthenticated() && loadingRecentConversations && (
-                  <div className="inline-flex items-center px-6 py-3 bg-blue-50 text-blue-700 rounded-full border border-blue-200">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Loading your conversation history...
-                  </div>
-                )}
-              </div>
-
-              {/* Enhanced Search Bar */}
-              <div className="mb-16">
-                <SearchBar
-                  onSearch={handleSearch}
-                  placeholder="What would you like to find today?"
-                  loading={loading}
-                />
-              </div>
-
-              {/* Simplified Features Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                {FEATURES.map((feature) => (
-                  <div key={feature.id} className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${
-                      feature.iconColor === 'blue' ? 'from-blue-500 to-blue-600' :
-                      feature.iconColor === 'green' ? 'from-emerald-500 to-emerald-600' :
-                      'from-purple-500 to-purple-600'
-                    } flex items-center justify-center mb-4 mx-auto`}>
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {feature.iconColor === 'blue' ? (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        ) : feature.iconColor === 'green' ? (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                        ) : (
+        {!chatStarted ? (
+          // Chatbot-style Welcome Interface
+          <div className="flex-1 flex items-center justify-center px-4 py-8">
+            <div className="w-full max-w-2xl">
+              {/* Chat Window Container */}
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+                {/* Chat Header */}
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4 text-white">
+                  <div className="flex items-center space-x-3">
+                    <div className="relative">
+                      <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        )}
-                      </svg>
+                        </svg>
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                    <p className="text-gray-600 text-sm">{feature.description}</p>
+                    <div>
+                      <h3 className="font-semibold text-lg">A³ Assistant</h3>
+                      <p className="text-white/80 text-sm">Online • Ready to help</p>
+                    </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Chat Messages Area */}
+                <div className="p-6 min-h-[400px] max-h-[500px] flex flex-col">
+                  {/* Welcome Messages */}
+                  <div className="space-y-4 mb-6">
+                    {/* Bot Welcome Message */}
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="bg-gray-100 rounded-2xl rounded-tl-lg px-4 py-3 inline-block max-w-xs">
+                          <p className="text-sm text-gray-800">👋 Hello! I'm A³, your AI shopping assistant.</p>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Just now</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="bg-gray-100 rounded-2xl rounded-tl-lg px-4 py-3 inline-block max-w-sm">
+                          <p className="text-sm text-gray-800">I can help you find anything, anywhere, anytime! What are you looking for today?</p>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Just now</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Loading indicator for recent conversations */}
+                  {isAuthenticated() && loadingRecentConversations && (
+                    <div className="flex items-start space-x-3 mb-4">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="bg-blue-50 border border-blue-200 rounded-2xl rounded-tl-lg px-4 py-3 inline-block">
+                          <p className="text-sm text-blue-700">Loading your conversation history...</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Quick Start Buttons */}
+                  <div className="mt-auto space-y-3">
+                    <p className="text-sm text-gray-500 text-center">Or try one of these:</p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {quickStartOptions.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleQuickStart(option)}
+                          className="flex items-center space-x-3 w-full p-3 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl text-left transition-colors duration-200 hover:border-blue-300 group"
+                          disabled={loading}
+                        >
+                          <span className="text-lg">{option.icon}</span>
+                          <span className="text-sm text-gray-700 group-hover:text-gray-900">{option.text}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chat Input */}
+                <div className="border-t border-gray-200 p-4 bg-gray-50">
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (message.trim()) {
+                      handleSearch(message.trim());
+                      setMessage('');
+                    }
+                  }} className="flex items-center space-x-3">
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        placeholder="Type your message here..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        className="w-full px-4 py-3 bg-white border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        disabled={loading}
+                        ref={inputRef}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading || !message.trim()}
+                      className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200"
+                    >
+                      {loading ? (
+                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                      )}
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
-        )}
-
-        {chatStarted && (
+        ) : (
+          // Full Chat Interface (when chatStarted is true)
           <div className="flex-1 flex flex-col px-4 py-6">
             <div className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
               {/* Chat Container */}
