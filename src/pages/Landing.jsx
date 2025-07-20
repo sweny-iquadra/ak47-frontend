@@ -590,7 +590,7 @@ const CombinedLandingChatbot = () => {
                           <div className={`flex-1 max-w-xl ${msg.sender === 'user' ? 'flex flex-col items-end' : ''}`}>
                             <div className="flex items-center space-x-2 mb-2">
                               <span className="text-sm font-semibold text-gray-700">
-                                {msg.sender === 'bot' ? 'A³ Assistant' : 'You'}
+                                {msg.sender === 'bot' ? 'A³' : 'You'}
                               </span>
                               {msg.step && (
                                 <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
