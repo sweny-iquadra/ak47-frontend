@@ -70,9 +70,9 @@ const Header = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  AI Assistant
+                  A³
                 </h1>
-                <p className="text-xs text-gray-500 -mt-1">Smart Shopping</p>
+                <p className="text-xs text-gray-500 -mt-1">Anything Anywhere Anytime</p>
               </div>
             </button>
           </div>

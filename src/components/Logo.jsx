@@ -16,127 +16,133 @@ const Logo = ({ size = 'default', showText = true }) => {
 
   return (
     <div className="flex items-center space-x-3 logo-container group">
-      {/* AI Shopping Assistant Logo */}
+      {/* A³ Cube Logo */}
       <div className="relative">
         <svg 
           width="40" 
           height="40" 
           viewBox="0 0 40 40" 
-          className={`text-blue-600 logo-svg transition-all duration-300 ${sizeClasses[size]} group-hover:scale-105`}
+          className={`logo-svg transition-all duration-300 ${sizeClasses[size]} group-hover:scale-105`}
           fill="currentColor"
         >
-          {/* Main circular background with gradient */}
-          <circle 
-            cx="20" 
-            cy="20" 
-            r="18" 
-            fill="url(#aiGradient)" 
-            stroke="url(#borderGradient)" 
-            strokeWidth="2"
-          />
-          
-          {/* Shopping cart body */}
-          <path 
-            d="M8 10 L12 10 L14 22 L28 22 L30 14 L16 14" 
-            fill="none" 
-            stroke="#ffffff" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-            opacity="0.95"
-          />
-          
-          {/* Cart wheels */}
-          <circle cx="16" cy="26" r="1.5" fill="#ffffff" opacity="0.95" />
-          <circle cx="26" cy="26" r="1.5" fill="#ffffff" opacity="0.95" />
-          
-          {/* AI Brain circuits overlay */}
-          <g opacity="0.9">
-            {/* Neural network nodes */}
-            <circle cx="20" cy="12" r="1" fill="rgba(245, 158, 11, 1)" />
-            <circle cx="16" cy="16" r="1" fill="rgba(245, 158, 11, 1)" />
-            <circle cx="24" cy="16" r="1" fill="rgba(245, 158, 11, 1)" />
-            <circle cx="20" cy="20" r="1" fill="rgba(245, 158, 11, 1)" />
+          {/* 3D Cube Structure */}
+          <g>
+            {/* Top face of cube */}
+            <path 
+              d="M8 16 L20 8 L32 16 L20 24 Z" 
+              fill="url(#topFaceGradient)" 
+              stroke="url(#cubeStroke)" 
+              strokeWidth="1"
+            />
             
-            {/* Neural connections */}
-            <line x1="20" y1="12" x2="16" y2="16" stroke="rgba(245, 158, 11, 1)" strokeWidth="0.8" opacity="0.8" />
-            <line x1="20" y1="12" x2="24" y2="16" stroke="rgba(245, 158, 11, 1)" strokeWidth="0.8" opacity="0.8" />
-            <line x1="16" y1="16" x2="20" y2="20" stroke="rgba(245, 158, 11, 1)" strokeWidth="0.8" opacity="0.8" />
-            <line x1="24" y1="16" x2="20" y2="20" stroke="rgba(245, 158, 11, 1)" strokeWidth="0.8" opacity="0.8" />
+            {/* Left face of cube */}
+            <path 
+              d="M8 16 L20 24 L20 36 L8 28 Z" 
+              fill="url(#leftFaceGradient)" 
+              stroke="url(#cubeStroke)" 
+              strokeWidth="1"
+            />
+            
+            {/* Right face of cube */}
+            <path 
+              d="M20 24 L32 16 L32 28 L20 36 Z" 
+              fill="url(#rightFaceGradient)" 
+              stroke="url(#cubeStroke)" 
+              strokeWidth="1"
+            />
+            
+            {/* Inner edges for depth */}
+            <line x1="20" y1="8" x2="20" y2="24" stroke="url(#edgeGradient)" strokeWidth="0.8" opacity="0.7" />
+            <line x1="8" y1="16" x2="20" y2="24" stroke="url(#edgeGradient)" strokeWidth="0.8" opacity="0.7" />
+            <line x1="32" y1="16" x2="20" y2="24" stroke="url(#edgeGradient)" strokeWidth="0.8" opacity="0.7" />
           </g>
           
-          {/* AI Chip/Processor symbol */}
-          <rect 
-            x="17" 
-            y="7" 
-            width="6" 
-            height="6" 
-            rx="1" 
-            fill="url(#chipGradient)" 
-            stroke="#ffffff" 
-            strokeWidth="0.5"
-          />
+          {/* Letter A in the center of cube */}
+          <text 
+            x="20" 
+            y="22" 
+            textAnchor="middle" 
+            dominantBaseline="middle" 
+            className="font-bold text-white"
+            style={{ fontSize: '14px', fontFamily: 'Arial, sans-serif' }}
+            fill="#ffffff"
+            stroke="#1e293b"
+            strokeWidth="0.3"
+          >
+            A
+          </text>
           
-          {/* Chip pins */}
-          <line x1="15" y1="9" x2="17" y2="9" stroke="#ffffff" strokeWidth="0.5" />
-          <line x1="15" y1="11" x2="17" y2="11" stroke="#ffffff" strokeWidth="0.5" />
-          <line x1="23" y1="9" x2="25" y2="9" stroke="#ffffff" strokeWidth="0.5" />
-          <line x1="23" y1="11" x2="25" y2="11" stroke="#ffffff" strokeWidth="0.5" />
+          {/* AI Circuit overlay on top face */}
+          <g opacity="0.8">
+            {/* Neural network nodes */}
+            <circle cx="14" cy="14" r="0.8" fill="#F59E0B" />
+            <circle cx="26" cy="14" r="0.8" fill="#F59E0B" />
+            <circle cx="20" cy="10" r="0.8" fill="#F59E0B" />
+            
+            {/* Neural connections */}
+            <line x1="14" y1="14" x2="20" y2="10" stroke="#F59E0B" strokeWidth="0.6" opacity="0.9" />
+            <line x1="26" y1="14" x2="20" y2="10" stroke="#F59E0B" strokeWidth="0.6" opacity="0.9" />
+            <line x1="14" y1="14" x2="26" y2="14" stroke="#F59E0B" strokeWidth="0.6" opacity="0.9" />
+          </g>
           
-          {/* Search/Magnifying glass */}
-          <circle cx="32" cy="8" r="3" fill="none" stroke="#F59E0B" strokeWidth="1.5" opacity="0.9" />
-          <line x1="34.5" y1="10.5" x2="37" y2="13" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
-          
-          {/* Price tag */}
-          <path 
-            d="M6 30 L10 30 L12 28 L10 26 L6 26 Z" 
-            fill="#0891B2" 
-            opacity="0.9"
-          />
-          <circle cx="8" cy="28" r="0.5" fill="#ffffff" />
+          {/* Floating data particles around cube */}
+          <g className="animate-pulse">
+            <circle cx="6" cy="12" r="1" fill="#3B82F6" opacity="0.6" />
+            <circle cx="34" cy="20" r="1" fill="#10B981" opacity="0.6" />
+            <circle cx="12" cy="32" r="1" fill="#8B5CF6" opacity="0.6" />
+            <circle cx="28" cy="6" r="1" fill="#F59E0B" opacity="0.6" />
+          </g>
           
           {/* Gradient definitions */}
           <defs>
-            {/* Main AI gradient - Matching theme colors */}
-            <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0F766E" />
-              <stop offset="30%" stopColor="#0891B2" />
-              <stop offset="70%" stopColor="#3B82F6" />
-              <stop offset="100%" stopColor="rgba(245, 158, 11, 1)" />
+            {/* Top face gradient - brightest */}
+            <linearGradient id="topFaceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="50%" stopColor="#1D4ED8" />
+              <stop offset="100%" stopColor="#1E40AF" />
             </linearGradient>
             
-            {/* Border gradient */}
-            <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(245, 158, 11, 1)" />
-              <stop offset="50%" stopColor="#0891B2" />
-              <stop offset="100%" stopColor="rgba(245, 158, 11, 1)" />
+            {/* Left face gradient - medium */}
+            <linearGradient id="leftFaceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#1E40AF" />
+              <stop offset="50%" stopColor="#1E3A8A" />
+              <stop offset="100%" stopColor="#172554" />
             </linearGradient>
             
-            {/* Chip gradient - Amber accent for tech */}
-            <linearGradient id="chipGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            {/* Right face gradient - darkest */}
+            <linearGradient id="rightFaceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#1E3A8A" />
+              <stop offset="50%" stopColor="#172554" />
+              <stop offset="100%" stopColor="#0F172A" />
+            </linearGradient>
+            
+            {/* Cube stroke gradient */}
+            <linearGradient id="cubeStroke" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#F59E0B" />
-              <stop offset="100%" stopColor="#D97706" />
+              <stop offset="50%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#F59E0B" />
+            </linearGradient>
+            
+            {/* Edge gradient */}
+            <linearGradient id="edgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#F59E0B" />
+              <stop offset="100%" stopColor="#3B82F6" />
             </linearGradient>
           </defs>
         </svg>
         
         {/* Animated glow effect */}
-        <div className="absolute inset-0 rounded-full bg-amber-400 opacity-20 blur-md -z-10 logo-glow group-hover:opacity-40 group-hover:scale-110 transition-all duration-300 animate-pulse"></div>
+        <div className="absolute inset-0 rounded-lg bg-blue-400 opacity-20 blur-md -z-10 logo-glow group-hover:opacity-40 group-hover:scale-110 transition-all duration-300 animate-pulse"></div>
       </div>
       
       {/* Brand name with tech-inspired styling */}
       {showText && (
         <div className="flex flex-col brand-text">
-          <div className={`font-bold bg-gradient-to-r from-teal-700 via-blue-600 bg-clip-text text-transparent ${textSizeClasses[size]}`}
-               style={{ 
-                 backgroundImage: `linear-gradient(to right, #0F766E, #2563EB, rgba(245, 158, 11, 1))`,
-                 WebkitBackgroundClip: 'text',
-                 WebkitTextFillColor: 'transparent' 
-               }}>
+          <div className={`font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent ${textSizeClasses[size]}`}>
             A³
           </div>
-          <div className="text-xs text-amber-600 font-medium tracking-wide uppercase flex items-center space-x-1">
-            <span className="inline-block w-1 h-1 bg-amber-500 rounded-full animate-pulse"></span>
+          <div className="text-xs text-blue-600 font-medium tracking-wide uppercase flex items-center space-x-1">
+            <span className="inline-block w-1 h-1 bg-blue-500 rounded-full animate-pulse"></span>
             <span>Anything Anywhere Anytime</span>
           </div>
         </div>

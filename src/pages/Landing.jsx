@@ -353,7 +353,7 @@ const CombinedLandingChatbot = () => {
                 </div>
                 
                 <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  {HERO_CONTENT.title}
+                  Meet A³, Your AI Assistant
                 </h1>
                 
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
