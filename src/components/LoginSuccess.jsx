@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { userAPI } from '../utils/api';
 
 const LoginSuccess = () => {
   const navigate = useNavigate();
@@ -14,7 +15,22 @@ const LoginSuccess = () => {
 
     if (token) {
       localStorage.setItem('token', token);
-      navigate('/');
+
+      // Fetch user data after storing token
+      const fetchUserData = async () => {
+        try {
+          const userData = await userAPI.getProfile();
+          localStorage.setItem('user', JSON.stringify(userData));
+          console.log('✅ User data stored after Google login:', userData);
+          navigate('/');
+        } catch (error) {
+          console.error('❌ Error fetching user data:', error);
+          // Still navigate to home even if user data fetch fails
+          navigate('/');
+        }
+      };
+
+      fetchUserData();
     } else {
       navigate('/login');
     }

@@ -50,7 +50,8 @@ const Header = () => {
   const avatarUrl = user && user.avatar ? user.avatar : null; // or user.profile_image
   const avatarLetter = user && user.full_name
     ? user.full_name[0].toUpperCase()
-    : (user && user.username ? user.username[0].toUpperCase() : 'U');
+    : (user && user.username ? user.username[0].toUpperCase() :
+      user && user.email ? user.email[0].toUpperCase() : 'U');
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -80,19 +81,21 @@ const Header = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen((open) => !open)}
-                  className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-amber-400 hover:bg-amber-600 transition-colors duration-200"
                   aria-label="User menu"
                 >
                   {avatarUrl ? (
                     <img src={avatarUrl} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
                   ) : (
-                    avatarLetter
+                    <span className="text-white font-semibold">{avatarLetter}</span>
                   )}
                 </button>
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
                     <div className="px-4 py-2 text-gray-700 font-semibold border-b">
-                      {user && user.full_name ? user.full_name : user && user.username ? user.username : 'User'}
+                      {user && user.full_name ? user.full_name :
+                        user && user.username ? user.username :
+                          user && user.email ? user.email : 'User'}
                     </div>
                     <Link
                       to="/profile"

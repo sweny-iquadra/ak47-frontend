@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
-import { authAPI, googleLogin } from '../utils/api';
+import { authAPI, chatAPI, googleLogin } from '../utils/api';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -32,18 +32,32 @@ const Login = () => {
       // Store token and user data in localStorage
       if (data.access_token) {
         localStorage.setItem('token', data.access_token);
+      }
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+
+      // Link session to user if restoring chat
+      if (location.state?.from === '/chat' && location.state?.chatSession?.session_id) {
+        try {
+          const linkResult = await chatAPI.linkSessionToUser(location.state.chatSession.session_id);
+          if (!linkResult.success) {
+            console.error('Failed to link session:', linkResult.error);
+          } else {
+            console.log('Session linked successfully');
+          }
+        } catch (e) {
+          console.error('Error linking session to user:', e);
         }
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        
-        // Redirect logic for chat restoration
-        if (location.state?.from === '/chat' && location.state?.chatSession) {
-          navigate('/chat', { state: { chatSession: location.state.chatSession } });
-        } else {
-          navigate('/');
-        }
-      
+      }
+
+      // Redirect logic for chat restoration
+      if (location.state?.from === '/chat' && location.state?.chatSession) {
+        navigate('/', { state: { chatSession: location.state.chatSession } });
+      } else {
+        navigate('/');
+      }
+
     } catch (error) {
       setError(error.message || 'Login failed. Please check your credentials.');
       console.error('Login error:', error);
@@ -166,20 +180,20 @@ const Login = () => {
           </form>
 
           <div className="mt-6">
-              <button
-                type="button"
+            <button
+              type="button"
               onClick={handleGoogleLogin}
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
+            >
               <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
                 <g>
-                  <path d="M44.5 20H24v8.5h11.7C34.7 32.9 30.1 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.5 5.1 29.5 3 24 3c-7.2 0-13.4 3.1-17.7 8z" fill="#FF3D00"/>
-                  <path d="M24 45c5.4 0 10.4-1.8 14.3-4.9l-6.6-5.4C29.7 36.9 27 38 24 38c-6.1 0-10.7-3.1-13.2-7.6l-7 5.4C6.6 41.9 14.7 45 24 45z" fill="#4CAF50"/>
-                  <path d="M44.5 20H24v8.5h11.7c-1.2 3.2-4.2 5.5-7.7 5.5-2.2 0-4.2-.7-5.7-2l-7 5.4C15.5 43.9 19.4 47 24 47c10.5 0 19.5-7.6 21-17.5.1-.7.1-1.3.1-2S44.6 20.7 44.5 20z" fill="#1976D2"/>
+                  <path d="M44.5 20H24v8.5h11.7C34.7 32.9 30.1 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.5 5.1 29.5 3 24 3c-7.2 0-13.4 3.1-17.7 8z" fill="#FF3D00" />
+                  <path d="M24 45c5.4 0 10.4-1.8 14.3-4.9l-6.6-5.4C29.7 36.9 27 38 24 38c-6.1 0-10.7-3.1-13.2-7.6l-7 5.4C6.6 41.9 14.7 45 24 45z" fill="#4CAF50" />
+                  <path d="M44.5 20H24v8.5h11.7c-1.2 3.2-4.2 5.5-7.7 5.5-2.2 0-4.2-.7-5.7-2l-7 5.4C15.5 43.9 19.4 47 24 47c10.5 0 19.5-7.6 21-17.5.1-.7.1-1.3.1-2S44.6 20.7 44.5 20z" fill="#1976D2" />
                 </g>
-                </svg>
+              </svg>
               Continue with Google
-              </button>
+            </button>
           </div>
         </div>
       </div>
