@@ -336,13 +336,33 @@ const CombinedLandingChatbot = () => {
     }
   };
 
-  // Quick start options
+  // Quick start options - Dynamic suggestions for clothing and electronics
   const quickStartOptions = [
-    { text: "Find me a laptop under $800", icon: "💻" },
-    { text: "Show me trendy sneakers", icon: "👟" },
-    { text: "I need a birthday gift for my mom", icon: "🎁" },
-    { text: "Best deals on kitchen appliances", icon: "🍳" }
+    // Electronics category
+    { text: "Latest smartphones under $600", icon: "📱", category: "electronics" },
+    { text: "Gaming laptops with RTX graphics", icon: "🎮", category: "electronics" },
+    { text: "Wireless headphones for music", icon: "🎧", category: "electronics" },
+    { text: "Smart watches for fitness tracking", icon: "⌚", category: "electronics" },
+    
+    // Clothing category  
+    { text: "Trendy winter jackets for men", icon: "🧥", category: "clothing" },
+    { text: "Comfortable running shoes", icon: "👟", category: "clothing" },
+    { text: "Casual summer dresses", icon: "👗", category: "clothing" },
+    { text: "Professional work shirts", icon: "👔", category: "clothing" }
   ];
+
+  // Randomly select 4 suggestions (2 from each category)
+  const getRandomSuggestions = () => {
+    const electronics = quickStartOptions.filter(opt => opt.category === 'electronics');
+    const clothing = quickStartOptions.filter(opt => opt.category === 'clothing');
+    
+    const randomElectronics = electronics.sort(() => 0.5 - Math.random()).slice(0, 2);
+    const randomClothing = clothing.sort(() => 0.5 - Math.random()).slice(0, 2);
+    
+    return [...randomElectronics, ...randomClothing].sort(() => 0.5 - Math.random());
+  };
+
+  const [displayedSuggestions, setDisplayedSuggestions] = useState(getRandomSuggestions());
 
   const handleQuickStart = (option) => {
     handleSearch(option.text);
@@ -432,7 +452,7 @@ const CombinedLandingChatbot = () => {
                   <div className="mt-auto space-y-3">
                     <p className="text-sm text-gray-500 text-center">Or try one of these:</p>
                     <div className="grid grid-cols-1 gap-2">
-                      {quickStartOptions.map((option, index) => (
+                      {displayedSuggestions.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleQuickStart(option)}
@@ -441,8 +461,20 @@ const CombinedLandingChatbot = () => {
                         >
                           <span className="text-lg">{option.icon}</span>
                           <span className="text-sm text-gray-700 group-hover:text-gray-900">{option.text}</span>
+                          <span className="ml-auto text-xs text-gray-400 capitalize">{option.category}</span>
                         </button>
                       ))}
+                    </div>
+                    
+                    {/* Refresh suggestions button */}
+                    <div className="mt-3 text-center">
+                      <button
+                        onClick={() => setDisplayedSuggestions(getRandomSuggestions())}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+                        disabled={loading}
+                      >
+                        🔄 Show different suggestions
+                      </button>
                     </div>
                   </div>
                 </div>
