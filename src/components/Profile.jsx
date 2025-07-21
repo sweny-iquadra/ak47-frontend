@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
 import ChatHistory from './ChatHistory';
+import PurchaseHistory from './PurchaseHistory';
 import { isAuthenticated, getCurrentUser } from '../utils/api';
 
 const Profile = () => {
@@ -12,6 +13,7 @@ const Profile = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('account');
   const [showChatHistory, setShowChatHistory] = useState(false);
+  const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -279,7 +281,7 @@ const Profile = () => {
 
               {activeSection === 'history' && (
                 <div className="space-y-6">
-                  {!showChatHistory ? (
+                  {!showChatHistory && !showPurchaseHistory ? (
                     <>
                       <h2 className="text-2xl font-bold text-gray-900 mb-6">Activity & History</h2>
                       
@@ -311,22 +313,25 @@ const Profile = () => {
                             <div className="flex items-center space-x-4">
                               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
                                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Activity Log</h3>
-                                <p className="text-gray-600">Recent actions & searches</p>
+                                <h3 className="text-lg font-semibold text-gray-900">Purchase History</h3>
+                                <p className="text-gray-600">View your previous orders</p>
                               </div>
                             </div>
-                            <button className="px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors duration-200">
+                            <button 
+                              onClick={() => setShowPurchaseHistory(true)}
+                              className="px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors duration-200"
+                            >
                               View
                             </button>
                           </div>
                         </div>
                       </div>
                     </>
-                  ) : (
+                  ) : showChatHistory ? (
                     <div className="space-y-4">
                       <button
                         onClick={() => setShowChatHistory(false)}
@@ -338,6 +343,19 @@ const Profile = () => {
                         <span className="text-sm font-medium">Back to Activity & History</span>
                       </button>
                       <ChatHistory onClose={() => setShowChatHistory(false)} />
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <button
+                        onClick={() => setShowPurchaseHistory(false)}
+                        className="flex items-center space-x-2 text-purple-600 hover:text-purple-700 transition-colors duration-200"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span className="text-sm font-medium">Back to Activity & History</span>
+                      </button>
+                      <PurchaseHistory onClose={() => setShowPurchaseHistory(false)} />
                     </div>
                   )}
                 </div>
