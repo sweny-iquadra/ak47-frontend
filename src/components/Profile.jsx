@@ -21,6 +21,82 @@ const Profile = () => {
     setDropdownOpen(false);
   };
 
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [updateData, setUpdateData] = useState({
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const handleUpdateEmail = async () => {
+    if (!updateData.email.trim()) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    setIsUpdatingEmail(true);
+    try {
+      // TODO: Call API to update email
+      // Example: await userAPI.updateEmail({ email: updateData.email });
+      console.log('API Call: Update email to', updateData.email);
+      
+      // On success, update local user data
+      // const updatedUser = { ...user, email: updateData.email };
+      // localStorage.setItem('user', JSON.stringify(updatedUser));
+      // setUser(updatedUser);
+      
+      alert('Email updated successfully!');
+      setUpdateData(prev => ({ ...prev, email: '' }));
+    } catch (error) {
+      console.error('Failed to update email:', error);
+      alert('Failed to update email. Please try again.');
+    } finally {
+      setIsUpdatingEmail(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!updateData.currentPassword || !updateData.newPassword || !updateData.confirmPassword) {
+      alert('Please fill in all password fields');
+      return;
+    }
+
+    if (updateData.newPassword !== updateData.confirmPassword) {
+      alert('New passwords do not match');
+      return;
+    }
+
+    if (updateData.newPassword.length < 6) {
+      alert('New password must be at least 6 characters long');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      // TODO: Call API to update password
+      // Example: await userAPI.updatePassword({ 
+      //   currentPassword: updateData.currentPassword,
+      //   newPassword: updateData.newPassword 
+      // });
+      console.log('API Call: Update password');
+      
+      alert('Password updated successfully!');
+      setUpdateData(prev => ({ 
+        ...prev, 
+        currentPassword: '', 
+        newPassword: '', 
+        confirmPassword: '' 
+      }));
+    } catch (error) {
+      console.error('Failed to update password:', error);
+      alert('Failed to update password. Please try again.');
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
   const handleUpdateField = (field) => {
     console.log(`Update ${field}`);
   };
@@ -192,47 +268,125 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  <div className="grid gap-4">
-                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                            </svg>
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900">Email Address</h3>
-                            <p className="text-gray-600">{user && user.email ? user.email : 'user@example.com'}</p>
-                          </div>
+                  <div className="grid gap-6">
+                    {/* Email Update Section */}
+                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                      <div className="flex items-center space-x-4 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                          </svg>
                         </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900">Email Address</h3>
+                          <p className="text-gray-600">Current: {user && user.email ? user.email : 'user@example.com'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            New Email Address
+                          </label>
+                          <input
+                            type="email"
+                            value={updateData.email}
+                            onChange={(e) => setUpdateData(prev => ({ ...prev, email: e.target.value }))}
+                            placeholder="Enter new email address"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        
                         <button
-                          onClick={() => handleUpdateField('email')}
-                          className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors duration-200"
+                          onClick={handleUpdateEmail}
+                          disabled={isUpdatingEmail || !updateData.email.trim()}
+                          className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                         >
-                          Update
+                          {isUpdatingEmail ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Updating...
+                            </>
+                          ) : (
+                            'Update Email'
+                          )}
                         </button>
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900">Password</h3>
-                            <p className="text-gray-600">Last updated 30 days ago</p>
-                          </div>
+                    {/* Password Update Section */}
+                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                      <div className="flex items-center space-x-4 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
                         </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900">Password</h3>
+                          <p className="text-gray-600">Update your account password</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Current Password
+                          </label>
+                          <input
+                            type="password"
+                            value={updateData.currentPassword}
+                            onChange={(e) => setUpdateData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                            placeholder="Enter current password"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            New Password
+                          </label>
+                          <input
+                            type="password"
+                            value={updateData.newPassword}
+                            onChange={(e) => setUpdateData(prev => ({ ...prev, newPassword: e.target.value }))}
+                            placeholder="Enter new password"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Confirm New Password
+                          </label>
+                          <input
+                            type="password"
+                            value={updateData.confirmPassword}
+                            onChange={(e) => setUpdateData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                            placeholder="Confirm new password"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                        </div>
+                        
                         <button
-                          onClick={() => handleUpdateField('password')}
-                          className="px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors duration-200"
+                          onClick={handleUpdatePassword}
+                          disabled={isUpdatingPassword || !updateData.currentPassword || !updateData.newPassword || !updateData.confirmPassword}
+                          className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                         >
-                          Update
+                          {isUpdatingPassword ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Updating...
+                            </>
+                          ) : (
+                            'Update Password'
+                          )}
                         </button>
                       </div>
                     </div>
