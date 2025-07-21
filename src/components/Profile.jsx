@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
@@ -238,13 +237,26 @@ const Profile = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Logout Button - Only in Account tab */}
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={handleLogout}
+                      className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" />
+                      </svg>
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
               )}
 
               {activeSection === 'preferences' && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">AI Assistant Preferences</h2>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                       <div className="flex items-center justify-between">
@@ -260,7 +272,7 @@ const Profile = () => {
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                       <div className="flex items-center justify-between">
                         <div>
@@ -284,7 +296,7 @@ const Profile = () => {
                   {!showChatHistory && !showPurchaseHistory ? (
                     <>
                       <h2 className="text-2xl font-bold text-gray-900 mb-6">Activity & History</h2>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
                           <div className="flex items-center justify-between">
@@ -307,7 +319,7 @@ const Profile = () => {
                             </button>
                           </div>
                         </div>
-                        
+
                         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
@@ -364,7 +376,7 @@ const Profile = () => {
               {activeSection === 'support' && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Help & Support</h2>
-                  
+
                   <div className="grid gap-6">
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                       <div className="flex items-center space-x-4">
@@ -402,19 +414,6 @@ const Profile = () => {
                   </div>
                 </div>
               )}
-
-              {/* Logout Button */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" />
-                  </svg>
-                  Sign Out
-                </button>
-              </div>
             </div>
           </div>
         </div>
