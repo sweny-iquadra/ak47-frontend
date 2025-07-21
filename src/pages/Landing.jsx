@@ -343,7 +343,7 @@ const CombinedLandingChatbot = () => {
     { text: "Gaming laptops with RTX graphics", icon: "🎮", category: "electronics" },
     { text: "Wireless headphones for music", icon: "🎧", category: "electronics" },
     { text: "Smart watches for fitness tracking", icon: "⌚", category: "electronics" },
-    
+
     // Clothing category  
     { text: "Trendy winter jackets for men", icon: "🧥", category: "clothing" },
     { text: "Comfortable running shoes", icon: "👟", category: "clothing" },
@@ -355,10 +355,10 @@ const CombinedLandingChatbot = () => {
   const getRandomSuggestions = () => {
     const electronics = quickStartOptions.filter(opt => opt.category === 'electronics');
     const clothing = quickStartOptions.filter(opt => opt.category === 'clothing');
-    
+
     const randomElectronics = electronics.sort(() => 0.5 - Math.random()).slice(0, 2);
     const randomClothing = clothing.sort(() => 0.5 - Math.random()).slice(0, 2);
-    
+
     return [...randomElectronics, ...randomClothing].sort(() => 0.5 - Math.random());
   };
 
@@ -396,7 +396,7 @@ const CombinedLandingChatbot = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex flex-col">
       <Header />
-      
+
       <main className="flex-1 flex flex-col">
         {!chatStarted ? (
           // Chatbot-style Welcome Interface
@@ -489,8 +489,8 @@ const CombinedLandingChatbot = () => {
                           <span className="ml-auto text-xs text-gray-400 capitalize">{option.category}</span>
                         </button>
                       ))}
-                    </div>
-                    
+          </div>
+
                     {/* Refresh suggestions button */}
                     <div className="mt-3 text-center">
                       <button
@@ -500,9 +500,9 @@ const CombinedLandingChatbot = () => {
                       >
                         🔄 Show different suggestions
                       </button>
-                    </div>
-                  </div>
-                </div>
+            </div>
+          </div>
+        </div>
 
                 {/* Chat Input */}
                 <div className="border-t border-gray-200 p-4 bg-gray-50">
@@ -570,11 +570,10 @@ const CombinedLandingChatbot = () => {
 
                         <div className={`flex items-start space-x-4 ${msg.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
                           {/* Avatar */}
-                          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white font-semibold shadow-lg ${
-                            msg.sender === 'bot' 
-                              ? 'bg-gradient-to-br from-blue-500 to-indigo-600' 
+                          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white font-semibold shadow-lg ${msg.sender === 'bot'
+                              ? 'bg-gradient-to-br from-blue-500 to-indigo-600'
                               : 'bg-gradient-to-br from-amber-500 to-orange-600'
-                          }`}>
+                            }`}>
                             {msg.sender === 'bot' ? (
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -607,12 +606,11 @@ const CombinedLandingChatbot = () => {
                                 </span>
                               )}
                             </div>
-                            
-                            <div className={`inline-block px-6 py-4 rounded-2xl shadow-sm ${
-                              msg.sender === 'user' 
-                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' 
+
+                            <div className={`inline-block px-6 py-4 rounded-2xl shadow-sm ${msg.sender === 'user'
+                                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
                                 : 'bg-gray-50 text-gray-900 border border-gray-100'
-                            }`}>
+                              }`}>
                               <p className="text-sm leading-relaxed">{msg.text}</p>
                             </div>
                           </div>
@@ -635,17 +633,17 @@ const CombinedLandingChatbot = () => {
                           <span className="text-sm text-amber-800 font-medium">Login required to view product details</span>
                         </div>
                       )}
-                      
+
                       <div className="grid gap-4">
                         {products.map((product) => (
                           <div key={product.id} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                             <div className="flex items-center space-x-6">
                               <div className="w-24 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
                                 {product.image_url ? (
-                                  <img 
-                                    src={Array.isArray(product.image_url) ? product.image_url[0] : product.image_url} 
-                                    alt={product.name} 
-                                    className="w-full h-full object-cover rounded-xl" 
+                                  <img
+                                    src={Array.isArray(product.image_url) ? product.image_url[0] : product.image_url}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover rounded-xl"
                                   />
                                 ) : (
                                   <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -653,11 +651,11 @@ const CombinedLandingChatbot = () => {
                                   </svg>
                                 )}
                               </div>
-                              
+
                               <div className="flex-1">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
                                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">{product.description}</p>
-                                
+
                                 <button
                                   onClick={() => {
                                     if (!isAuthenticated()) {
@@ -712,7 +710,7 @@ const CombinedLandingChatbot = () => {
                         )}
                       </div>
                     </div>
-                    
+
                     <button
                       type="submit"
                       className="px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-2xl hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"

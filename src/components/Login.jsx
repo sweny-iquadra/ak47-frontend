@@ -13,6 +13,11 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,6 +80,38 @@ const Login = () => {
 
   const handleGoogleLogin = () => {
     googleLogin();
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setForgotError('');
+    setForgotSuccess('');
+    try {
+      const resp = await authAPI.forgotPassword(forgotEmail);
+      if (resp.success) {
+        setForgotSuccess(resp.message || 'If an account exists for this email, a password reset link has been sent.');
+      } else {
+        setForgotError(resp.message || 'Failed to send reset email.');
+      }
+    } catch (err) {
+      setForgotError(err.message || 'Failed to send reset email.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
+  const handleOpenForgot = () => {
+    setShowForgotModal(true);
+    setForgotEmail('');
+    setForgotError('');
+    setForgotSuccess('');
+  };
+  const handleCloseForgot = () => {
+    setShowForgotModal(false);
+    setForgotEmail('');
+    setForgotError('');
+    setForgotSuccess('');
   };
 
   return (
@@ -180,7 +217,7 @@ const Login = () => {
               </div>
 
               <div className="text-sm">
-                <button type="button" className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
+                <button type="button" className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200" onClick={handleOpenForgot}>
                   Forgot password?
                 </button>
               </div>
@@ -248,6 +285,42 @@ const Login = () => {
           </div>
         </div>
       </div>
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 animate-fadeIn">
+            <button
+              onClick={handleCloseForgot}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 focus:outline-none"
+              aria-label="Close forgot password dialog"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Forgot Password</h2>
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <input
+                type="email"
+                required
+                placeholder="Enter your email"
+                className="block w-full px-4 py-3 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 backdrop-blur-sm text-gray-900"
+                value={forgotEmail}
+                onChange={e => setForgotEmail(e.target.value)}
+              />
+              {forgotError && <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded">{forgotError}</div>}
+              {forgotSuccess && <div className="bg-green-100 border border-green-300 text-green-700 px-4 py-2 rounded">{forgotSuccess}</div>}
+              <button
+                type="submit"
+                disabled={forgotLoading}
+                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200"
+              >
+                {forgotLoading ? 'Sending...' : 'Send Reset Link'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

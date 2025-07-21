@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
 import ChatHistory from './ChatHistory';
 import PurchaseHistory from './PurchaseHistory';
@@ -7,13 +7,30 @@ import { isAuthenticated, getCurrentUser, userAPI } from '../utils/api';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loggedIn, setLoggedIn] = useState(isAuthenticated());
   const [user, setUser] = useState(getCurrentUser());
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('account');
+  const [activeSection, setActiveSection] = useState(() => {
+    // Check sessionStorage for persisted tab
+    const persistedTab = sessionStorage.getItem('profileActiveTab');
+    return persistedTab || 'account';
+  });
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (location.state && location.state.activeTab === 'history') {
+      setActiveSection('history');
+      sessionStorage.setItem('profileActiveTab', 'history');
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    // Persist tab on change
+    sessionStorage.setItem('profileActiveTab', activeSection);
+  }, [activeSection]);
 
   // Close dropdown on outside click
   useEffect(() => {

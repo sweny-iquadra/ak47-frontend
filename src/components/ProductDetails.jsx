@@ -2,7 +2,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
-import { isAuthenticated, getCurrentUser } from '../utils/api';
+import { isAuthenticated, getCurrentUser, orderAPI, paymentAPI } from '../utils/api';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+
+// Modal component
+const Modal = ({ open, onClose, children }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 animate-fadeIn">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 focus:outline-none"
+          aria-label="Close payment dialog"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
 
 const ProductDetails = () => {
   const navigate = useNavigate();
@@ -11,6 +36,12 @@ const ProductDetails = () => {
   const [user, setUser] = useState(getCurrentUser());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [clientSecret, setClientSecret] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [modalError, setModalError] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const product = location.state?.product;
 
@@ -44,9 +75,46 @@ const ProductDetails = () => {
     );
   }
 
-  const handleBuyNow = () => {
-    const url = product.product_url;
-    window.open(url, "_blank", "noopener,noreferrer");
+  const handleBuyNow = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Dummy shipping address (replace with real form/modal if needed)
+      const shippingAddress = {
+        name: user?.full_name || user?.username || 'Test User',
+        address: '123 Test St',
+        city: 'Testville',
+        state: 'TS',
+        zip: '12345',
+        country: 'Testland',
+        phone: '1234567890',
+      };
+      // Calculate total (price + taxes + shipping)
+      const totalAmount = Number(product.price) || 0;
+      const shippingCost = 0;
+      const taxes = Number(product.taxes) || 1.1;
+      // 1. Create order
+      const createdOrder = await orderAPI.createOrder({
+        product_id: product.id,
+        total_amount: totalAmount,
+        shipping_cost: 1.1,
+        taxes,
+        shipping_address: shippingAddress,
+      });
+      setOrder(createdOrder);
+      // 2. Create Stripe payment intent
+      const paymentIntent = await paymentAPI.createPaymentIntent(createdOrder.total_amount + createdOrder.shipping_cost + createdOrder.taxes, createdOrder.id);
+      // 3. Show card form if client_secret is returned
+      if (paymentIntent.client_secret) {
+        setClientSecret(paymentIntent.client_secret);
+      } else {
+        throw new Error('No Stripe client secret returned.');
+      }
+    } catch (e) {
+      setError(e.message || 'Payment failed.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogoClick = () => {
@@ -86,6 +154,84 @@ const ProductDetails = () => {
   // Helper for images
   const mainImage = product.image_url || null;
   const sideImages = product.images?.slice(1, 3) || [];
+
+  // Modified CardForm with confirmation prompt and error handling
+  const CardForm = ({ clientSecret, onSuccess, onError }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [cardLoading, setCardLoading] = useState(false);
+    const [localError, setLocalError] = useState(null);
+    const [confirming, setConfirming] = useState(false);
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLocalError(null);
+      setConfirming(false);
+      if (!stripe || !elements) return;
+      setCardLoading(true);
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+        }
+      });
+      setCardLoading(false);
+      if (result.error) {
+        setLocalError(result.error.message);
+        onError(result.error.message);
+      } else if (result.paymentIntent.status === 'succeeded') {
+        onSuccess(result.paymentIntent.id);
+      }
+    };
+
+    // Show confirmation dialog before payment
+    const handleConfirm = (e) => {
+      e.preventDefault();
+      setConfirming(true);
+    };
+    const handleCancelConfirm = () => setConfirming(false);
+    const handleProceed = (e) => {
+      setConfirming(false);
+      handleSubmit(e);
+    };
+
+    return (
+      <form onSubmit={handleConfirm} className="max-w-md mx-auto mt-4 p-6 bg-white rounded-xl shadow-lg">
+        {localError && (
+          <div className="mb-4 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded relative flex items-center justify-between">
+            <span>{localError}</span>
+            <button type="button" className="ml-4 text-red-500 hover:text-red-700" onClick={() => setLocalError(null)} aria-label="Dismiss error">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+        <CardElement className="mb-4 p-2 border rounded" />
+        <button type="submit" disabled={!stripe || cardLoading} className="px-6 py-2 bg-blue-600 text-white rounded font-bold">
+          {cardLoading ? 'Processing...' : 'Pay'}
+        </button>
+        {/* Confirmation Prompt */}
+        {confirming && (
+          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-xl shadow-xl p-8 max-w-xs w-full text-center">
+              <h3 className="text-lg font-semibold mb-4">Confirm Payment</h3>
+              <p className="mb-6">Are you sure you want to pay?</p>
+              <div className="flex justify-center gap-4">
+                <button type="button" className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 font-medium" onClick={handleCancelConfirm}>Cancel</button>
+                <button type="button" className="px-4 py-2 bg-blue-600 text-white rounded font-bold" onClick={handleProceed}>Yes, Pay</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </form>
+    );
+  };
+
+  // Reset modal error when modal closes
+  const handleCloseModal = () => {
+    setClientSecret(null);
+    setModalError(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -365,18 +511,50 @@ const ProductDetails = () => {
                   <button
                     onClick={handleBuyNow}
                     className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-2xl hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+                    disabled={loading}
                   >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                    Buy Now
+                    {loading ? (
+                      <span>Processing...</span>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        Buy Now
+                      </>
+                    )}
                   </button>
+                  {error && <div className="text-red-600 font-semibold mt-2">{error}</div>}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </main>
+      {clientSecret && order && (
+        <Modal open={!!clientSecret} onClose={handleCloseModal}>
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Enter Payment Details</h2>
+            {modalError && (
+              <div className="mb-4 bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded relative flex items-center justify-between">
+                <span>{modalError}</span>
+                <button type="button" className="ml-4 text-red-500 hover:text-red-700" onClick={() => setModalError(null)} aria-label="Dismiss error">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            <CardForm
+              clientSecret={clientSecret}
+              onSuccess={(paymentIntentId) => {
+                navigate(`/payment-success?payment_id=${paymentIntentId}&order_id=${order.id}&amount=${order.total_amount + order.shipping_cost + order.taxes}`);
+              }}
+              onError={setModalError}
+            />
+          </Elements>
+        </Modal>
+      )}
     </div>
   );
 };

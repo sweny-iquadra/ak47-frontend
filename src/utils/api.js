@@ -67,7 +67,23 @@ export const authAPI = {
   // Google OAuth login
   googleLogin: async () => {
     window.location.href = `${API_BASE_URL}/auth/google-login`;
-  }
+  },
+
+  // Forgot password (send reset email)
+  forgotPassword: async (email) => {
+    return apiCall('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  },
+
+  // Reset password (with token)
+  resetPassword: async (token, newPassword, confirmPassword) => {
+    return apiCall('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, new_password: newPassword, confirm_password: confirmPassword })
+    });
+  },
 };
 
 // Chat API functions
@@ -192,10 +208,14 @@ export const orderAPI = {
 
 // Payment API functions
 export const paymentAPI = {
-  // Create payment intent
   createPaymentIntent: async (amount, orderId) => {
+    const token = localStorage.getItem('token');
     return apiCall('/payments/create-intent', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` // if required
+      },
       body: JSON.stringify({ amount, order_id: orderId })
     });
   }

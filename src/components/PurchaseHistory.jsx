@@ -1,118 +1,76 @@
 
 import React, { useState, useEffect } from 'react';
+import { orderAPI } from '../utils/api';
 
 const PurchaseHistory = ({ onClose }) => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Mock purchase history data
-  const mockOrders = [
-    {
-      id: 'ORD-2024-001',
-      date: '2024-01-15',
-      time: '14:30',
-      status: 'Delivered',
-      total: '$1,299.99',
-      items: [
-        {
-          id: 1,
-          name: 'ASUS ROG Strix G15 Gaming Laptop',
-          price: '$1,199.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=150&h=150&fit=crop&crop=center'
-        },
-        {
-          id: 2,
-          name: 'Gaming Mouse Pad',
-          price: '$29.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=150&h=150&fit=crop&crop=center'
-        },
-        {
-          id: 3,
-          name: 'Laptop Sleeve',
-          price: '$39.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=150&h=150&fit=crop&crop=center'
-        }
-      ],
-      shippingAddress: '123 Main St, City, State 12345',
-      trackingNumber: 'TRK123456789'
-    },
-    {
-      id: 'ORD-2024-002',
-      date: '2024-01-10',
-      time: '09:15',
-      status: 'Shipped',
-      total: '$89.97',
-      items: [
-        {
-          id: 4,
-          name: 'Wireless Bluetooth Headphones',
-          price: '$59.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&h=150&fit=crop&crop=center'
-        },
-        {
-          id: 5,
-          name: 'Phone Case',
-          price: '$19.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=150&h=150&fit=crop&crop=center'
-        },
-        {
-          id: 6,
-          name: 'USB-C Cable',
-          price: '$9.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=150&h=150&fit=crop&crop=center'
-        }
-      ],
-      shippingAddress: '123 Main St, City, State 12345',
-      trackingNumber: 'TRK987654321'
-    },
-    {
-      id: 'ORD-2024-003',
-      date: '2024-01-05',
-      time: '16:45',
-      status: 'Processing',
-      total: '$249.98',
-      items: [
-        {
-          id: 7,
-          name: 'Mechanical Keyboard',
-          price: '$129.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1541140532154-b024d705b90a?w=150&h=150&fit=crop&crop=center'
-        },
-        {
-          id: 8,
-          name: 'Gaming Mouse',
-          price: '$79.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=150&h=150&fit=crop&crop=center'
-        },
-        {
-          id: 9,
-          name: 'Monitor Stand',
-          price: '$39.99',
-          quantity: 1,
-          image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=150&h=150&fit=crop&crop=center'
-        }
-      ],
-      shippingAddress: '123 Main St, City, State 12345',
-      trackingNumber: 'TRK456789123'
-    }
-  ];
+  const [detailLoading, setDetailLoading] = useState(false);
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setOrders(mockOrders);
+    const fetchOrders = async () => {
+      setLoading(true);
+      try {
+        const apiOrders = await orderAPI.getOrders();
+        // Sort by created_at descending
+        apiOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        // Map API response to expected structure for UI
+        const mappedOrders = apiOrders.map(order => ({
+          id: order.id,
+          date: order.created_at ? new Date(order.created_at).toISOString().split('T')[0] : '',
+          time: order.created_at ? new Date(order.created_at).toLocaleTimeString() : '',
+          status: order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Processing',
+          total: `$${(order.total_amount + order.shipping_cost + order.taxes).toFixed(2)}`,
+          items: [
+            {
+              id: order.product_id,
+              name: order.product_name || 'Product',
+              price: `$${order.total_amount.toFixed(2)}`,
+              quantity: 1,
+              image: order.product_image || 'https://via.placeholder.com/150',
+            }
+          ],
+          shippingAddress: order.shipping_address ? Object.values(order.shipping_address).join(', ') : '',
+          trackingNumber: order.tracking_info?.tracking_number || 'N/A',
+        }));
+        setOrders(mappedOrders);
+      } catch (e) {
+        setOrders([]);
+      }
       setLoading(false);
-    }, 1000);
+    };
+    fetchOrders();
   }, []);
+
+  const handleOrderClick = async (order) => {
+    setDetailLoading(true);
+    try {
+      const detail = await orderAPI.getOrder(order.id);
+      // Map API response to detail view structure
+      setSelectedOrder({
+        id: detail.id,
+        date: detail.created_at ? new Date(detail.created_at).toISOString().split('T')[0] : '',
+        time: detail.created_at ? new Date(detail.created_at).toLocaleTimeString() : '',
+        status: detail.status ? detail.status.charAt(0).toUpperCase() + detail.status.slice(1) : 'Processing',
+        total: `$${(detail.total_amount + detail.shipping_cost + detail.taxes).toFixed(2)}`,
+        items: [
+          {
+            id: detail.product_id,
+            name: detail.product_name || 'Product',
+            price: `$${detail.total_amount.toFixed(2)}`,
+            quantity: 1,
+            image: detail.product_image || 'https://via.placeholder.com/150',
+          }
+        ],
+        shippingAddress: detail.shipping_address ? Object.values(detail.shipping_address).join(', ') : '',
+        trackingNumber: detail.tracking_info?.tracking_number || 'N/A',
+      });
+    } catch (e) {
+      setSelectedOrder(null);
+    }
+    setDetailLoading(false);
+  };
 
   const getStatusColor = (status) => {
     const colors = {
@@ -126,10 +84,10 @@ const PurchaseHistory = ({ onClose }) => {
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -177,8 +135,8 @@ const PurchaseHistory = ({ onClose }) => {
               {selectedOrder.items.map((item) => (
                 <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
                   <div className="w-16 h-16 bg-white rounded-lg overflow-hidden shadow-sm">
-                    <img 
-                      src={item.image} 
+                    <img
+                      src={item.image}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
@@ -232,10 +190,10 @@ const PurchaseHistory = ({ onClose }) => {
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <div 
-              key={order.id} 
+            <div
+              key={order.id}
               className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
-              onClick={() => setSelectedOrder(order)}
+              onClick={() => handleOrderClick(order)}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4 flex-1">
