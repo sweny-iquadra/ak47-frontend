@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
 import ChatHistory from './ChatHistory';
 import PurchaseHistory from './PurchaseHistory';
-import { isAuthenticated, getCurrentUser } from '../utils/api';
+import { isAuthenticated, getCurrentUser, userAPI } from '../utils/api';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -43,41 +43,35 @@ const Profile = () => {
     newPassword: '',
     confirmPassword: ''
   });
+  const [passwordMessage, setPasswordMessage] = useState(null);
 
   const handleUpdatePassword = async () => {
+    setPasswordMessage(null);
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      alert('Please fill in all password fields');
+      setPasswordMessage({ type: 'error', text: 'Please fill in all password fields.' });
       return;
     }
-
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+      setPasswordMessage({ type: 'error', text: 'New passwords do not match.' });
       return;
     }
-
     if (passwordData.newPassword.length < 6) {
-      alert('New password must be at least 6 characters long');
+      setPasswordMessage({ type: 'error', text: 'New password must be at least 6 characters long.' });
       return;
     }
-
     setIsUpdatingPassword(true);
     try {
-      // TODO: Call API to update password
-      // Example: await userAPI.updatePassword({ 
-      //   currentPassword: passwordData.currentPassword,
-      //   newPassword: passwordData.newPassword 
-      // });
-      console.log('API Call: Update password');
-
-      alert('Password updated successfully!');
-      setPasswordData({
-        currentPassword: '', 
-        newPassword: '', 
-        confirmPassword: ''
-      });
+      await userAPI.changePassword(passwordData.currentPassword, passwordData.newPassword, passwordData.confirmPassword);
+      setPasswordMessage({ type: 'success', text: 'Password updated successfully! Please login again.' });
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => {
+        // Log out and redirect to login
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login?redirect=profile';
+      }, 2000);
     } catch (error) {
-      console.error('Failed to update password:', error);
-      alert('Failed to update password. Please try again.');
+      setPasswordMessage({ type: 'error', text: error.message || 'Failed to update password. Please try again.' });
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -207,8 +201,8 @@ const Profile = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold">
-                  {user && user.full_name ? user.full_name : 
-                   user && user.username ? user.username : 'User Profile'}
+                  {user && user.full_name ? user.full_name :
+                    user && user.username ? user.username : 'User Profile'}
                 </h1>
                 <p className="text-white/80 text-lg">A³ Premium Member</p>
                 <div className="flex items-center mt-2">
@@ -227,11 +221,10 @@ const Profile = () => {
                   <button
                     key={item.id}
                     onClick={() => setActiveSection(item.id)}
-                    className={`w-full flex items-center px-4 py-3 text-left rounded-xl transition-all duration-200 ${
-                      activeSection === item.id
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-                        : 'text-gray-700 hover:bg-white/70 hover:shadow-md'
-                    }`}
+                    className={`w-full flex items-center px-4 py-3 text-left rounded-xl transition-all duration-200 ${activeSection === item.id
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
+                      : 'text-gray-700 hover:bg-white/70 hover:shadow-md'
+                      }`}
                   >
                     <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
@@ -276,7 +269,9 @@ const Profile = () => {
                     {/* Password Update Section */}
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
-
+                      {passwordMessage && (
+                        <div className={`mb-4 px-4 py-2 rounded-xl text-sm font-medium ${passwordMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{passwordMessage.text}</div>
+                      )}
                       <div className="space-y-4">
                         <input
                           type="password"
@@ -396,7 +391,7 @@ const Profile = () => {
                                 <p className="text-gray-600">View all conversations</p>
                               </div>
                             </div>
-                            <button 
+                            <button
                               onClick={() => setShowChatHistory(true)}
                               className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors duration-200"
                             >
@@ -418,7 +413,7 @@ const Profile = () => {
                                 <p className="text-gray-600">View your previous orders</p>
                               </div>
                             </div>
-                            <button 
+                            <button
                               onClick={() => setShowPurchaseHistory(true)}
                               className="px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors duration-200"
                             >

@@ -15,22 +15,20 @@ const LoginSuccess = () => {
 
     if (token) {
       localStorage.setItem('token', token);
-
-      // Fetch user data after storing token
-      const fetchUserData = async () => {
+      // Fetch user profile and store in localStorage
+      const fetchUser = async () => {
         try {
-          const userData = await userAPI.getProfile();
-          localStorage.setItem('user', JSON.stringify(userData));
-          console.log('✅ User data stored after Google login:', userData);
-          navigate('/');
-        } catch (error) {
-          console.error('❌ Error fetching user data:', error);
-          // Still navigate to home even if user data fetch fails
-          navigate('/');
+          const user = await userAPI.getProfile();
+          console.log('✅ Google login: fetched user profile:', user);
+          localStorage.setItem('user', JSON.stringify(user));
+        } catch (e) {
+          console.error('❌ Google login: failed to fetch user profile:', e);
+          // fallback: clear user if fetch fails
+          localStorage.removeItem('user');
         }
+        navigate('/');
       };
-
-      fetchUserData();
+      fetchUser();
     } else {
       navigate('/login');
     }

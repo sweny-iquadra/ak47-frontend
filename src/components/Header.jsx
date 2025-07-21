@@ -49,10 +49,19 @@ const Header = () => {
   };
 
   const avatarUrl = user && user.avatar ? user.avatar : null; // or user.profile_image
-  const avatarLetter = user && user.full_name
-    ? user.full_name[0].toUpperCase()
-    : (user && user.username ? user.username[0].toUpperCase() :
+  console.log('👤 User data in Header:', user);
+  const avatarLetter = user && user.username
+    ? user.username[0].toUpperCase()
+    : (user && user.full_name ? user.full_name[0].toUpperCase() :
       user && user.email ? user.email[0].toUpperCase() : 'U');
+
+  // Debug logging to see user data structure
+  useEffect(() => {
+    if (user) {
+      console.log('👤 User data in Header:', user);
+      console.log('🔤 Avatar letter:', avatarLetter);
+    }
+  }, [user, avatarLetter]);
 
   return (
     <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-white/20 sticky top-0 z-50">

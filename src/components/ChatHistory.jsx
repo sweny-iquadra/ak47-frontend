@@ -1,93 +1,67 @@
 
 import React, { useState, useEffect } from 'react';
+import { chatAPI } from '../utils/api';
 
 const ChatHistory = ({ onClose }) => {
   const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Mock chat history data
-  const mockSessions = [
-    {
-      id: 'session_1',
-      title: 'Looking for Gaming Laptops',
-      date: '2024-01-15',
-      time: '14:30',
-      preview: 'I need a gaming laptop under $1500...',
-      category: 'Electronics',
-      messages: [
-        { sender: 'user', text: 'I need a gaming laptop under $1500', timestamp: '14:30' },
-        { sender: 'bot', text: 'I can help you find the perfect gaming laptop! What games do you primarily play?', timestamp: '14:31' },
-        { sender: 'user', text: 'Mostly FPS games like Call of Duty and some AAA titles', timestamp: '14:32' },
-        { sender: 'bot', text: 'Great! For FPS and AAA games, you\'ll want a laptop with at least GTX 1660 Ti or RTX 3060. Here are some excellent options under $1500:', timestamp: '14:33' },
-        { sender: 'user', text: 'The ASUS ROG Strix looks interesting. Can you tell me more?', timestamp: '14:35' },
-        { sender: 'bot', text: 'The ASUS ROG Strix G15 is an excellent choice! It features AMD Ryzen 7, RTX 3060, 16GB RAM, and a 144Hz display. Perfect for competitive gaming.', timestamp: '14:36' }
-      ]
-    },
-    {
-      id: 'session_2',
-      title: 'Winter Clothing Shopping',
-      date: '2024-01-14',
-      time: '16:45',
-      preview: 'I need warm winter jackets...',
-      category: 'Clothing',
-      messages: [
-        { sender: 'user', text: 'I need warm winter jackets for cold weather', timestamp: '16:45' },
-        { sender: 'bot', text: 'I\'d be happy to help you find warm winter jackets! What\'s your budget and preferred style?', timestamp: '16:46' },
-        { sender: 'user', text: 'Budget is around $200-300, prefer something stylish but functional', timestamp: '16:47' },
-        { sender: 'bot', text: 'Perfect! Here are some excellent winter jackets that balance style and warmth in your budget range:', timestamp: '16:48' }
-      ]
-    },
-    {
-      id: 'session_3',
-      title: 'Smart Home Devices',
-      date: '2024-01-13',
-      time: '10:15',
-      preview: 'Looking for smart speakers and lights...',
-      category: 'Electronics',
-      messages: [
-        { sender: 'user', text: 'Looking for smart speakers and lights for my new apartment', timestamp: '10:15' },
-        { sender: 'bot', text: 'Exciting! Smart home devices can really enhance your living space. What\'s the size of your apartment?', timestamp: '10:16' },
-        { sender: 'user', text: 'It\'s a 2-bedroom apartment, about 1000 sq ft', timestamp: '10:17' },
-        { sender: 'bot', text: 'For a 1000 sq ft apartment, I recommend starting with 2-3 smart speakers and smart bulbs for main areas. Here are my top recommendations:', timestamp: '10:18' }
-      ]
-    },
-    {
-      id: 'session_4',
-      title: 'Kitchen Appliances',
-      date: '2024-01-12',
-      time: '09:20',
-      preview: 'Need recommendations for kitchen appliances...',
-      category: 'Home & Kitchen',
-      messages: [
-        { sender: 'user', text: 'Need recommendations for kitchen appliances for my new home', timestamp: '09:20' },
-        { sender: 'bot', text: 'Congratulations on your new home! What kitchen appliances are you looking to purchase?', timestamp: '09:21' },
-        { sender: 'user', text: 'Mainly a refrigerator, microwave, and coffee maker', timestamp: '09:22' },
-        { sender: 'bot', text: 'Great choices! Let me help you find the best appliances for your needs and budget. What\'s your total budget for these three items?', timestamp: '09:23' }
-      ]
-    },
-    {
-      id: 'session_5',
-      title: 'Fitness Equipment',
-      date: '2024-01-11',
-      time: '18:30',
-      preview: 'Home gym setup recommendations...',
-      category: 'Sports & Fitness',
-      messages: [
-        { sender: 'user', text: 'Home gym setup recommendations for small space', timestamp: '18:30' },
-        { sender: 'bot', text: 'Perfect timing for New Year fitness goals! What type of workouts do you prefer?', timestamp: '18:31' },
-        { sender: 'user', text: 'Cardio and strength training, but space is limited', timestamp: '18:32' },
-        { sender: 'bot', text: 'For small spaces, I recommend versatile equipment that serves multiple purposes. Here are some space-efficient options:', timestamp: '18:33' }
-      ]
-    }
-  ];
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setSessions(mockSessions);
+    const fetchSessionsAndConversations = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // 1. Fetch all sessions for the user
+        const sessionList = await chatAPI.getRecentConversations();
+        // 2. For each session, fetch its conversations
+        const sessionsWithConvos = await Promise.all(
+          sessionList.map(async (session) => {
+            const convos = await chatAPI.loadConversationHistory(session.session_id);
+            // Debug: log the structure of convos
+            if (convos && convos.length > 0) {
+              console.log('Session', session.session_id, 'convos sample:', convos[0]);
+            }
+            // Generate a title: use category + first user message or fallback
+            let title = session.product_category ? session.product_category : 'Chat Session';
+            const firstUserMsg = convos.find(msg => msg.message_type === 'user');
+            if (firstUserMsg && firstUserMsg.content) {
+              const msgText = firstUserMsg.content;
+              title += ': ' + msgText.slice(0, 40) + (msgText.length > 40 ? '...' : '');
+            }
+            // Preview: first user message or bot message
+            let preview = '';
+            if (firstUserMsg && firstUserMsg.content) preview = firstUserMsg.content;
+            else if (convos[0] && convos[0].content) preview = convos[0].content;
+            // Date/time
+            const createdAt = session.created_at || (convos[0] && convos[0].created_at);
+            // Category
+            const category = session.product_category || 'General';
+            return {
+              id: session.session_id,
+              title,
+              date: createdAt ? new Date(createdAt).toISOString().slice(0, 10) : '',
+              time: createdAt ? new Date(createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+              preview,
+              category,
+              messages: convos.map(msg => ({
+                sender: msg.message_type === 'user' ? 'user' : 'bot',
+                text: msg.content || '',
+                timestamp: msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''
+              }))
+            };
+          })
+        );
+        // 3. Sort sessions by date descending
+        sessionsWithConvos.sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+        setSessions(sessionsWithConvos);
+      } catch (err) {
+        setError('Failed to load chat history.');
+      }
       setLoading(false);
-    }, 1000);
+    };
+    fetchSessionsAndConversations();
   }, []);
 
   const getCategoryColor = (category) => {
@@ -116,9 +90,14 @@ const ChatHistory = ({ onClose }) => {
   };
 
   if (selectedSession) {
+    // Sort messages by timestamp (if available)
+    const sortedMessages = [...selectedSession.messages].sort((a, b) => {
+      if (!a.timestamp || !b.timestamp) return 0;
+      return new Date('1970-01-01T' + a.timestamp) - new Date('1970-01-01T' + b.timestamp);
+    });
     return (
       <div className="space-y-6">
-        {/* Header with back button */}
+        {/* Header with back button and session metadata */}
         <div className="flex items-center justify-between pb-4 border-b border-gray-200">
           <div className="flex items-center space-x-4">
             <button
@@ -131,47 +110,63 @@ const ChatHistory = ({ onClose }) => {
             </button>
             <div>
               <h2 className="text-xl font-bold text-gray-900">{selectedSession.title}</h2>
-              <p className="text-sm text-gray-500">
-                {formatDate(selectedSession.date)} at {selectedSession.time}
-              </p>
+              <div className="flex items-center space-x-3 text-xs text-gray-500 mt-1">
+                <span>{selectedSession.date} at {selectedSession.time}</span>
+                <span>•</span>
+                <span className="capitalize">{selectedSession.category}</span>
+                <span>•</span>
+                <span>{sortedMessages.length} messages</span>
+              </div>
             </div>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(selectedSession.category)}`}>
-            {selectedSession.category}
-          </span>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(selectedSession.category)}`}>{selectedSession.category}</span>
         </div>
 
-        {/* Chat messages */}
-        <div className="space-y-4 max-h-96 overflow-y-auto">
-          {selectedSession.messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className="flex items-start space-x-3 max-w-2xl">
-                {msg.sender === 'bot' && (
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                  </div>
+        {/* Chatbot-style conversation UI */}
+        <div className="flex flex-col space-y-6 max-h-[32rem] overflow-y-auto px-2 py-4">
+          {sortedMessages.map((msg, idx) => (
+            <div key={idx} className={`flex items-start space-x-4 ${msg.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+              {/* Avatar */}
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white font-semibold shadow-lg ${msg.sender === 'bot'
+                ? 'bg-gradient-to-br from-blue-500 to-indigo-600'
+                : 'bg-gradient-to-br from-amber-500 to-orange-600'
+                }`}>
+                {msg.sender === 'bot' ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                 )}
-                
-                <div className={`rounded-2xl px-4 py-3 ${
-                  msg.sender === 'user'
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
-                    : 'bg-gray-100 text-gray-900'
-                } ${msg.sender === 'user' ? 'rounded-br-lg' : 'rounded-bl-lg'}`}>
-                  <p className="text-sm">{msg.text}</p>
-                  <p className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
-                    {msg.timestamp}
-                  </p>
-                </div>
+              </div>
 
-                {msg.sender === 'user' && (
-                  <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                )}
+              {/* Message Content */}
+              <div className={`flex-1 max-w-xl ${msg.sender === 'user' ? 'flex flex-col items-end' : ''}`}>
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-sm font-semibold text-gray-700 flex items-center space-x-1">
+                    {msg.sender === 'bot' ? (
+                      <>
+                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span className="text-xs px-2 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full font-bold">A³</span>
+                      </>
+                    ) : (
+                      'You'
+                    )}
+                  </span>
+                </div>
+                <div className={`inline-block px-6 py-4 rounded-2xl shadow-sm ${msg.sender === 'user'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                  : 'bg-gray-50 text-gray-900 border border-gray-100'
+                  }`}>
+                  <p className="text-sm leading-relaxed whitespace-pre-line">{msg.text}</p>
+                  {msg.timestamp && (
+                    <div className="text-xs text-gray-400 mt-2 text-right">{msg.timestamp}</div>
+                  )}
+                </div>
               </div>
             </div>
           ))}

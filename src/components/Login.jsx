@@ -56,7 +56,13 @@ const Login = () => {
       if (location.state?.from === '/chat' && location.state?.chatSession) {
         navigate('/', { state: { chatSession: location.state.chatSession } });
       } else {
-        navigate('/');
+        // Check for redirect query param
+        const params = new URLSearchParams(location.search);
+        if (params.get('redirect') === 'profile') {
+          navigate('/profile');
+        } else {
+          navigate('/');
+        }
       }
 
     } catch (error) {
