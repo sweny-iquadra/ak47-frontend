@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Logo from './Logo';
 import ChatHistory from './ChatHistory';
@@ -13,22 +13,6 @@ const Profile = () => {
   const [activeSection, setActiveSection] = useState('account');
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
-  const dropdownRef = useRef(null);
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    }
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [dropdownOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -169,7 +153,7 @@ const Profile = () => {
                   Sign In
                 </Link>
               ) : (
-                <div className="relative" ref={dropdownRef}>
+                <div className="relative">
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 hover:shadow-lg transform hover:scale-105 transition-all duration-200 shadow-lg"
