@@ -1,4 +1,3 @@
-export { default as Chatbot } from './Chatbot';
 export { default as FeatureCard } from './FeatureCard';
 export { default as Header } from './Header';
 export { default as Login } from './Login';

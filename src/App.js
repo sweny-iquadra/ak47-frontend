@@ -11,7 +11,6 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
-          <Route path="/chat" element={<Chatbot />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/product-details/:id" element={<ProductDetails />} />

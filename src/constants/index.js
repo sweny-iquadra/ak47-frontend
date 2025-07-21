@@ -30,7 +30,7 @@ export const FEATURES = [
 ];
 
 export const HERO_CONTENT = {
-  title: 'Meet A³, Your AI Shopping Assistant',
-  subtitle: 'Ask me to find products, compare prices, or get recommendations',
+  title: 'Meet A³, Your AI Assistant',
+  subtitle: 'Get anything, anywhere, anytime - Your AI-powered universal assistant',
   backgroundImage: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
 };

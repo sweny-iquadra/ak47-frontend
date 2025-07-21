@@ -96,6 +96,56 @@ export const chatAPI = {
   // Get search sessions
   getSearchSessions: async () => {
     return apiCall('/search-sessions');
+  },
+
+  // Link a chat session to the logged-in user
+  linkSessionToUser: async (sessionId) => {
+    const token = localStorage.getItem("token");
+    if (!token || !sessionId) {
+      console.error("Missing token or sessionId");
+      return;
+    }
+
+    try {
+      const apiUrl = `${API_BASE_URL}/chat/link-session`;
+      console.log(apiUrl);
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 🛡️ Auth header
+        },
+        body: JSON.stringify({ session_id: sessionId }), // 📦 Payload
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("❌ Failed to link session:", data);
+        return { success: false, error: data };
+      } else {
+        console.log("✅ Session linked:", data);
+        return { success: true, data };
+      }
+    } catch (error) {
+      console.error("🚨 Error linking session:", error);
+      return { success: false, error: error.message };
+    }
+  },
+
+  // Get recent conversations for the logged-in user
+  getRecentConversations: async () => {
+    return apiCall('/search-sessions');
+  },
+
+  // Load conversation history for a specific session
+  loadConversationHistory: async (sessionId) => {
+    return apiCall(`/conversations/${sessionId}`);
+  },
+
+  // Get products for a specific session
+  getSessionProducts: async (sessionId) => {
+    return apiCall(`/sessions/${sessionId}/products`);
   }
 };
 
@@ -109,7 +159,7 @@ export const productAPI = {
       ...(minPrice && { min_price: minPrice }),
       ...(maxPrice && { max_price: maxPrice })
     });
-    
+
     return apiCall(`/products/search?${params}`);
   },
 
@@ -170,6 +220,18 @@ export const userAPI = {
   logout: async () => {
     return apiCall('/auth/logout', {
       method: 'POST'
+    });
+  },
+
+  // Change password
+  changePassword: async (currentPassword, newPassword, confirmPassword) => {
+    return apiCall('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword
+      })
     });
   }
 };
