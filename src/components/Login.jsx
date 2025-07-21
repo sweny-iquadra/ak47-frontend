@@ -85,7 +85,7 @@ const Login = () => {
             Welcome Back
           </h2>
           <p className="mt-2 text-gray-600">
-            Sign in to continue with your AI shopping assistant
+            Sign in to continue
           </p>
         </div>
       </div>

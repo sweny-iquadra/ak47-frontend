@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Logo from './Logo';
@@ -20,13 +19,13 @@ const ProductDetails = () => {
   // TODO: Authentication check - uncomment when ready to implement
   /*
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+
   useEffect(() => {
     // Check if user is logged in by checking localStorage or making API call
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
     setIsLoggedIn(token && user);
-    
+
     // If not logged in, redirect to login
     if (!token || !user) {
       navigate('/login');
@@ -194,7 +193,10 @@ const ProductDetails = () => {
 
         {/* Product Overview */}
         {product.description && (
-          <p className="text-gray-600 mb-8 max-w-4xl">{product.description}</p>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
+            <p className="text-gray-600 leading-relaxed max-w-4xl">{product.description}</p>
+          </div>
         )}
 
         {/* Product Images Grid */}
@@ -221,14 +223,6 @@ const ProductDetails = () => {
             )}
           </div>
         </div>
-
-        {/* Product Overview Section */}
-        {product.overview && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Overview</h2>
-            <p className="text-gray-600 leading-relaxed max-w-4xl">{product.overview}</p>
-          </div>
-        )}
 
         {/* Specifications */}
         {specs.length > 0 && (

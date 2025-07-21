@@ -68,7 +68,7 @@ const Profile = () => {
       //   newPassword: passwordData.newPassword 
       // });
       console.log('API Call: Update password');
-      
+
       alert('Password updated successfully!');
       setPasswordData({
         currentPassword: '', 
@@ -276,7 +276,7 @@ const Profile = () => {
                     {/* Password Update Section */}
                     <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Change Password</h3>
-                      
+
                       <div className="space-y-4">
                         <input
                           type="password"
@@ -285,7 +285,7 @@ const Profile = () => {
                           placeholder="Current password"
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
-                        
+
                         <input
                           type="password"
                           value={passwordData.newPassword}
@@ -293,7 +293,7 @@ const Profile = () => {
                           placeholder="New password"
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
-                        
+
                         <input
                           type="password"
                           value={passwordData.confirmPassword}
@@ -301,7 +301,7 @@ const Profile = () => {
                           placeholder="Confirm new password"
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
-                        
+
                         <button
                           onClick={handleUpdatePassword}
                           disabled={isUpdatingPassword || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
@@ -437,7 +437,7 @@ const Profile = () => {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                         </svg>
-                        <span className="text-sm font-medium">Back to Activity & History</span>
+                        <span className="text-sm font-medium">Back to History</span>
                       </button>
                       <ChatHistory onClose={() => setShowChatHistory(false)} />
                     </div>
@@ -450,7 +450,7 @@ const Profile = () => {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                         </svg>
-                        <span className="text-sm font-medium">Back to Activity & History</span>
+                        <span className="text-sm font-medium">Back to History</span>
                       </button>
                       <PurchaseHistory onClose={() => setShowPurchaseHistory(false)} />
                     </div>
